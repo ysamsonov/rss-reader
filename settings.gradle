@@ -1,0 +1,3 @@
+rootProject.name = 'rss-reader'
+
+include 'rss-reader-core'

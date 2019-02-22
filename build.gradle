@@ -1,0 +1,53 @@
+buildscript {
+    ext {
+        jacksonVersion = "2.9.7"
+        lombokVersion = "1.18.4"
+        junitJupiterVersion = "5.4.0"
+        feignVersion = "10.0.1"
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+wrapper {
+    gradleVersion = '5.2.1'
+    distributionType = Wrapper.DistributionType.ALL
+    distributionSha256Sum = "9dc729f6dbfbbc4df1692665d301e028976dacac296a126f16148941a9cf012e"
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    group 'com.github.ysamsonov'
+    version '1.0-SNAPSHOT'
+
+    // 1.11
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile "org.projectlombok:lombok:${lombokVersion}"
+
+        // test
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+
+        testImplementation 'org.assertj:assertj-core:3.11.1'
+
+        testImplementation 'org.mockito:mockito-core:2.23.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:2.18.3'
+    }
+}
+
+project(":rss-reader-core") {
+    
+}
