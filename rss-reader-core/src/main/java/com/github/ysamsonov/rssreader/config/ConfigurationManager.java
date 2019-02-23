@@ -3,15 +3,18 @@ package com.github.ysamsonov.rssreader.config;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
+@Slf4j
 public class ConfigurationManager {
 
     private final ObjectMapper mapper = new ObjectMapper()
@@ -31,18 +34,42 @@ public class ConfigurationManager {
         load();
     }
 
-    @SneakyThrows
     private void load() {
         if (configFile.exists()) {
-            this.config = mapper.readValue(configFile, ReaderConfig.class);
+            try {
+                this.config = mapper.readValue(configFile, ReaderConfig.class);
+            }
+            catch (IOException e) {
+                String msg = String.format(
+                    "Error during read configuration file '%s'. %s",
+                    configFile.getPath(),
+                    e.getMessage()
+                );
+
+                log.error(msg);
+                log.error(msg, e);
+                throw new RssReaderException(msg, e);
+            }
         }
         else {
             this.config = new ReaderConfig();
         }
     }
 
-    @SneakyThrows
     public synchronized void persist() {
-        mapper.writeValue(configFile, config);
+        try {
+            mapper.writeValue(configFile, config);
+        }
+        catch (IOException e) {
+            String msg = String.format(
+                "Error during persist configuration to file '%s'. %s",
+                configFile.getPath(),
+                e.getMessage()
+            );
+
+            log.error(msg);
+            log.error(msg, e);
+            throw new RssReaderException(msg, e);
+        }
     }
 }

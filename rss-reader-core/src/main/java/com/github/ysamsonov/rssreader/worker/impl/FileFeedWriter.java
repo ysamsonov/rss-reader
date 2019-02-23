@@ -7,12 +7,10 @@ import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import com.github.ysamsonov.rssreader.worker.FeedWriter;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,7 +36,6 @@ public class FileFeedWriter implements FeedWriter {
     }
 
     @Override
-    @SneakyThrows
     public void write(SyndFeed syndFeed) {
         if (syndFeed == null) {
             log.info("Nothing to write for '{}'", feedConfig.getUrl());
@@ -55,34 +52,31 @@ public class FileFeedWriter implements FeedWriter {
         }
     }
 
-    private void writeFeed(SyndFeed syndFeed) throws IOException {
+    private void writeFeed(SyndFeed syndFeed) {
         log.info("Write data from feed '{}' to file '{}'", feedConfig.getUrl(), feedConfig.getFileName());
         try (
             FileWriter fileWriter = new FileWriter(feedConfig.getFileName(), true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             PrintWriter writer = new PrintWriter(bufferedWriter)
         ) {
-            try {
-                for (SyndEntry entry : syndFeed.getEntries()) {
-                    writeEntry(writer, entry);
-                }
+            for (SyndEntry entry : syndFeed.getEntries()) {
+                writeEntry(writer, entry);
             }
-            catch (Exception e) {
-                var msg = String.format(
-                    "Error during write '%s' feed info to '%s'. %s",
-                    feedConfig.getUrl(), feedConfig.getFileName(), e.getMessage()
-                );
+        }
+        catch (Exception e) {
+            var msg = String.format(
+                "Error during write '%s' feed info to '%s'. %s",
+                feedConfig.getUrl(), feedConfig.getFileName(), e.getMessage()
+            );
 
-                log.error(msg);
-                log.debug(msg, e);
-                throw new RssReaderException(msg, e);
-            }
+            log.error(msg);
+            log.debug(msg, e);
+            throw new RssReaderException(msg, e);
         }
 
         updateLastFetchDate();
     }
 
-    @SneakyThrows
     private void writeEntry(PrintWriter writer, SyndEntry entry) {
         for (var extractor : FieldExtractors.entryExt.entrySet()) {
             if (!propWritePredicate.test(extractor.getKey())) {
