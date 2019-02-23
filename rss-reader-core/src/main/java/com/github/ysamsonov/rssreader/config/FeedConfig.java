@@ -28,6 +28,8 @@ public class FeedConfig {
 
     private Collection<String> fields = new ArrayList<>();
 
+    private String fetchTime;
+
     private Date lastFetchDate;
 
     public FeedConfig() {

@@ -8,12 +8,14 @@
         "title",
         "description",
         "publishedDate"
-      ]
+      ],
+      "fetchTime": "1m"
     },
     {
       "url": "https://news.yandex.ru/auto.rss",
       "enabled": true,
-      "fileName": "auto_news.tst"
+      "fileName": "auto_news.tst",
+      "fetchTime": "10s"
     },
     {
       "url": "http://www.freeke.org/ffg/index.atom",

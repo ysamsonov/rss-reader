@@ -42,12 +42,22 @@ public class Application {
     }
 
     private void run() {
-        Scanner scanner = new Scanner(System.in);
+        System.out.println("App run");
 
-        System.out.println("await");
-        scanner.nextLine();
-        // TODO: terminate correctly
-        System.exit(0);
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Await");
+            String line = scanner.nextLine();
+            switch (line) {
+                case "quit":
+                case "q":
+                    // TODO: terminate correctly
+                    System.exit(0);
+
+                default:
+                    break;
+            }
+        }
     }
 
     private File getReaderConfigFile() {
