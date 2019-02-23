@@ -3,6 +3,7 @@ package com.github.ysamsonov.rssreader;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.helpers.PropertyResolver;
 import com.github.ysamsonov.rssreader.worker.FeedSynchronizer;
+import lombok.Getter;
 
 import java.io.File;
 import java.util.Scanner;
@@ -13,6 +14,9 @@ import java.util.Scanner;
  */
 public class Application {
 
+    @Getter
+    private static Application appInstance;
+
     private final ConfigurationManager configurationManager;
 
     private final PropertyResolver propertyResolver;
@@ -22,11 +26,12 @@ public class Application {
     private Application() {
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile());
-        this.feedSynchronizer = new FeedSynchronizer();
+        this.feedSynchronizer = new FeedSynchronizer(getThreadCount());
     }
 
     public static void main(String[] args) {
-        new Application()
+        appInstance = new Application();
+        appInstance
             .init()
             .run();
     }
@@ -48,5 +53,9 @@ public class Application {
     private File getReaderConfigFile() {
         String fileName = propertyResolver.getProperty("rssreader.config.location").orElse("reader-config.json");
         return new File(fileName);
+    }
+
+    private int getThreadCount() {
+        return propertyResolver.getProperty("rssreader.feed.synchronizer.pool.size", Integer.class).orElse(1);
     }
 }
