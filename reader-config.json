@@ -1,0 +1,25 @@
+{
+  "feeds": [
+    {
+      "url": "https://news.yandex.ru/sport.rss",
+      "enabled": true,
+      "fileName": "sport_news.tst",
+      "fields": [
+        "title",
+        "description"
+      ]
+    },
+    {
+      "url": "https://news.yandex.ru/auto.rss",
+      "enabled": true,
+      "fileName": "auto_news.tst"
+    },
+    {
+      "url": "http://www.freeke.org/ffg/index.atom",
+      "enabled": true,
+      "fileName": "atom.tst"
+    }
+  ],
+  "fetchCount": 10,
+  "fetchTime": "10m"
+}
