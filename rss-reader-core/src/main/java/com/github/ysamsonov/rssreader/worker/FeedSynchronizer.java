@@ -1,6 +1,5 @@
 package com.github.ysamsonov.rssreader.worker;
 
-import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.config.ReaderConfig;
 
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
@@ -20,22 +20,24 @@ public class FeedSynchronizer {
 
     private final ScheduledExecutorService executorService;
 
+    // feed unique name -> future
     private final Map<String, ScheduledFuture<?>> runningTasks = new ConcurrentHashMap<>();
 
-    // закидываем кучу врайтеров, каждый принадлежит какому-то файлу и потом раздаем во внутрь
-//    private final Map<String, filewriter>
+    // file name -> lock
+    private final Map<String, ReentrantLock> writerLocks = new ConcurrentHashMap<>();
 
     public FeedSynchronizer(int poolSize) {
         this.executorService = Executors.newScheduledThreadPool(poolSize);
     }
 
     public synchronized void update(ReaderConfig config) {
-        for (FeedConfig feed : config.getFeeds()) {
-            // TODO: открыть файлы тут и желательно держать их, но просто засунуть эту инфу в процессор ?? или врайтер
-            FeedSyncTask task = new FeedSyncTask(feed);
-            var delay = delayParser.parse(Optional.ofNullable(feed.getFetchTime()).orElse(config.getFetchTime()));
+        for (var feed : config.getFeeds()) {
+            final var writeLock = writerLocks.computeIfAbsent(feed.getFileName(), $ -> new ReentrantLock());
+            final var task = new FeedSyncTask(feed, writeLock);
 
-            ScheduledFuture<?> scheduledFuture = executorService.scheduleWithFixedDelay(
+            final var delay = delayParser.parse(Optional.ofNullable(feed.getFetchTime()).orElse(config.getFetchTime()));
+
+            final var scheduledFuture = executorService.scheduleWithFixedDelay(
                 task,
                 0,
                 delay.getDelay(),

@@ -7,6 +7,8 @@ import com.github.ysamsonov.rssreader.worker.impl.UrlFeedReader;
 import com.rometools.rome.feed.synd.SyndFeed;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
@@ -22,13 +24,12 @@ public class FeedSyncTask implements Runnable {
 
     private final FeedWriter writer;
 
-    // TODO куда писать надо принимать снаружи, а снаружи ииметь холдер стримов
-    public FeedSyncTask(FeedConfig feedConfig) {
+    public FeedSyncTask(FeedConfig feedConfig, ReentrantLock writeLock) {
         this.feedConfig = feedConfig;
 
         this.reader = new UrlFeedReader(feedConfig);
         this.processor = new FeedFilterProcessor(feedConfig);
-        this.writer = new FileFeedWriter(feedConfig);
+        this.writer = new FileFeedWriter(feedConfig, writeLock);
     }
 
     @Override

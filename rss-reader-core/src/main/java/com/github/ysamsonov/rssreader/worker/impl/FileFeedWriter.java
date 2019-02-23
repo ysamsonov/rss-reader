@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
 /**
@@ -28,9 +29,12 @@ public class FileFeedWriter implements FeedWriter {
 
     private final Predicate<String> propWritePredicate;
 
-    public FileFeedWriter(FeedConfig feedConfig) {
+    private final ReentrantLock lock;
+
+    public FileFeedWriter(FeedConfig feedConfig, ReentrantLock lock) {
         this.feedConfig = feedConfig;
         this.propWritePredicate = feedConfig.fieldPredicate();
+        this.lock = lock;
     }
 
     @Override
@@ -42,7 +46,13 @@ public class FileFeedWriter implements FeedWriter {
             return;
         }
 
-        writeFeed(syndFeed);
+        try {
+            lock.lock();
+            writeFeed(syndFeed);
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     private void writeFeed(SyndFeed syndFeed) throws IOException {
