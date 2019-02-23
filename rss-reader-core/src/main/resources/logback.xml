@@ -1,0 +1,24 @@
+<configuration scan="true" scanPeriod="10 seconds">
+    <property name="LOG_PATTERN" value="%d{yyyy.MM.dd'T'HH:mm:ss.SSSZ} [%thread] %-5level %logger{5} - %msg%n" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>rssreader.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--<logger name="com.github.ysamsonov.rssreader" level="DEBUG"/>-->
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="FILE"/>-->
+    </root>
+</configuration>
