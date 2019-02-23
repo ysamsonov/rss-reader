@@ -3,6 +3,7 @@ package com.github.ysamsonov.rssreader.worker.impl;
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
+import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import com.github.ysamsonov.rssreader.worker.FeedWriter;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -14,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.function.Predicate;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
@@ -24,8 +26,11 @@ public class FileFeedWriter implements FeedWriter {
 
     private final FeedConfig feedConfig;
 
+    private final Predicate<String> propWritePredicate;
+
     public FileFeedWriter(FeedConfig feedConfig) {
         this.feedConfig = feedConfig;
+        this.propWritePredicate = feedConfig.fieldPredicate();
     }
 
     @Override
@@ -43,13 +48,13 @@ public class FileFeedWriter implements FeedWriter {
     private void writeFeed(SyndFeed syndFeed) throws IOException {
         log.info("Write data from feed '{}' to file '{}'", feedConfig.getUrl(), feedConfig.getFileName());
         try (
-            FileWriter fw = new FileWriter(feedConfig.getFileName(), true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw)
+            FileWriter fileWriter = new FileWriter(feedConfig.getFileName(), true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            PrintWriter writer = new PrintWriter(bufferedWriter)
         ) {
             try {
                 for (SyndEntry entry : syndFeed.getEntries()) {
-                    writeEntry(out, entry);
+                    writeEntry(writer, entry);
                 }
             }
             catch (Exception e) {
@@ -60,7 +65,7 @@ public class FileFeedWriter implements FeedWriter {
 
                 log.error(msg);
                 log.debug(msg, e);
-                throw new RssReaderException(msg);
+                throw new RssReaderException(msg, e);
             }
         }
 
@@ -68,17 +73,22 @@ public class FileFeedWriter implements FeedWriter {
     }
 
     @SneakyThrows
-    private void writeEntry(PrintWriter out, SyndEntry entry) {
+    private void writeEntry(PrintWriter writer, SyndEntry entry) {
         for (var extractor : FieldExtractors.entryExt.entrySet()) {
-            out.write(extractor.getKey() + ": ");
-
-            Object value = extractor.getValue().apply(entry);
-            if (value != null) {
-                out.write(value.toString());
+            if (!propWritePredicate.test(extractor.getKey())) {
+                log.debug("Skip property '{}' during writing", extractor.getKey());
+                continue;
             }
-            out.write("\n");
+
+            writer.write(extractor.getKey() + ": ");
+
+            String value = extractor.getValue().apply(entry);
+            if (!MiscUtils.isNullOrEmpty(value)) {
+                writer.write(value);
+            }
+            writer.write("\n");
         }
-        out.write("\n");
+        writer.write("\n");
     }
 
     private void updateLastFetchDate() {

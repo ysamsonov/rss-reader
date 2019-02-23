@@ -11,7 +11,7 @@ import java.util.Optional;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
-public class FeedFilterProcessor implements FeedProcessor {
+public class FeedFilterProcessor implements FeedProcessor<SyndFeed, SyndFeed> {
 
     private final FeedConfig feedConfig;
 

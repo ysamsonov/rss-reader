@@ -1,8 +1,9 @@
 package com.github.ysamsonov.rssreader.helpers;
 
+import com.github.ysamsonov.rssreader.utils.MapBuilder;
 import com.rometools.rome.feed.synd.*;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -12,41 +13,37 @@ import java.util.stream.Collectors;
  */
 public final class FieldExtractors {
 
-    // TODO: use map builder
-    public static final HashMap<String, Function<SyndFeed, String>> feedExt = new HashMap<>();
+    public static final Map<String, Function<SyndFeed, String>> feedExt = MapBuilder.<String, Function<SyndFeed, String>>create()
+        .put("copyright", SyndFeed::getCopyright)
+        .put("generator", SyndFeed::getGenerator)
+        .put("image", f -> f.getImage() != null ? f.getImage().getUrl() : null)
+        .put("icon", f -> f.getIcon() != null ? f.getIcon().getUrl() : null)
+        .buildImmutable();
 
-    public static final HashMap<String, Function<SyndEntry, String>> entryExt = new HashMap<>();
-
-    static {
-        feedExt.put("copyright", SyndFeed::getCopyright);
-        feedExt.put("generator", SyndFeed::getGenerator);
-        feedExt.put("image", f -> f.getImage() != null ? f.getImage().getUrl() : null);
-        feedExt.put("icon", f -> f.getIcon() != null ? f.getIcon().getUrl() : null);
-
-
-        entryExt.put("uri", SyndEntry::getUri);
-        entryExt.put("title", SyndEntry::getTitle);
-        entryExt.put("link", SyndEntry::getLink); //links
-        entryExt.put("description", e -> e.getDescription() != null ? e.getDescription().getValue() : null);
-        entryExt.put(
+    public static final Map<String, Function<SyndEntry, String>> entryExt = MapBuilder.<String, Function<SyndEntry, String>>create()
+        .put("uri", SyndEntry::getUri)
+        .put("title", SyndEntry::getTitle)
+        .put("link", SyndEntry::getLink) //links
+        .put("description", e -> e.getDescription() != null ? e.getDescription().getValue() : null)
+        .put(
             "contents",
             $ -> $.getContents().stream().map(SyndContent::getValue).collect(Collectors.joining("; "))
-        );
-        entryExt.put(
+        )
+        .put(
             "enclosures",
             $ -> $.getEnclosures().stream().map(SyndEnclosure::getUrl).collect(Collectors.joining("; "))
-        );
-        entryExt.put("publishedDate", s -> s.getPublishedDate() != null ? s.getPublishedDate().toString() : null);
-        entryExt.put("updatedDate", s -> s.getUpdatedDate() != null ? s.getUpdatedDate().toString() : null);
-        entryExt.put("author", SyndEntry::getAuthor); // authors
-        entryExt.put(
+        )
+        .put("publishedDate", s -> s.getPublishedDate() != null ? s.getPublishedDate().toString() : null)
+        .put("updatedDate", s -> s.getUpdatedDate() != null ? s.getUpdatedDate().toString() : null)
+        .put("author", SyndEntry::getAuthor) // authors
+        .put(
             "contributors",
             $ -> $.getContributors().stream().map(SyndPerson::getName).collect(Collectors.joining("; "))
-        );
-        entryExt.put(
+        )
+        .put(
             "categories",
-            $ -> $.getCategories().stream().map(c -> c.getName()).collect(Collectors.joining("; "))
-        );
-        entryExt.put("comments", SyndEntry::getComments); // authors
-    }
+            $ -> $.getCategories().stream().map(SyndCategory::getName).collect(Collectors.joining("; "))
+        )
+        .put("comments", SyndEntry::getComments)
+        .buildImmutable();
 }

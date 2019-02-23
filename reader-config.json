@@ -6,7 +6,8 @@
       "fileName": "sport_news.tst",
       "fields": [
         "title",
-        "description"
+        "description",
+        "publishedDate"
       ]
     },
     {

@@ -1,5 +1,6 @@
 package com.github.ysamsonov.rssreader.config;
 
+import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
@@ -29,6 +31,15 @@ public class FeedConfig {
     private Date lastFetchDate;
 
     public FeedConfig() {
+    }
+
+    public Predicate<String> fieldPredicate() {
+        if (MiscUtils.isNullOrEmpty(getFields())) {
+            return $ -> true;
+        }
+        else {
+            return $ -> getFields().contains($);
+        }
     }
 
     @Override

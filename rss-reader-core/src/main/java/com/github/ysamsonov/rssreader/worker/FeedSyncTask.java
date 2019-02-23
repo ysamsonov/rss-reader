@@ -4,6 +4,7 @@ import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.worker.impl.FeedFilterProcessor;
 import com.github.ysamsonov.rssreader.worker.impl.FileFeedWriter;
 import com.github.ysamsonov.rssreader.worker.impl.UrlFeedReader;
+import com.rometools.rome.feed.synd.SyndFeed;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +18,7 @@ public class FeedSyncTask implements Runnable {
 
     private final FeedReader reader;
 
-    private final FeedProcessor processor;
+    private final FeedProcessor<SyndFeed, SyndFeed> processor;
 
     private final FeedWriter writer;
 

@@ -1,7 +1,7 @@
 package com.github.ysamsonov.rssreader.exception;
 
 /**
- * @author Yuriy A. Samsonov <y.samsonov@erpscan.com>
+ * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
 public class RssReaderException extends RuntimeException {
