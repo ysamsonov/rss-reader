@@ -25,7 +25,7 @@ public final class FieldExtractors {
         entryExt.put("uri", SyndEntry::getUri);
         entryExt.put("title", SyndEntry::getTitle);
         entryExt.put("link", SyndEntry::getLink); //links
-        entryExt.put("description", e -> e.getDescription()!=null? e.getDescription().getValue():null);
+        entryExt.put("description", e -> e.getDescription() != null ? e.getDescription().getValue() : null);
         entryExt.put("contents", SyndEntry::getContents);
 //        entryExt.put("contents", e->e.getContents().stream().map(SyndContent::getValue).collect(Collectors.joining()));
         entryExt.put("enclosures", SyndEntry::getEnclosures);

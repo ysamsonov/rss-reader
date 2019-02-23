@@ -1,79 +1,37 @@
 package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
-import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.XmlReader;
-import lombok.SneakyThrows;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.net.URL;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
+@Slf4j
 public class FeedSyncTask implements Runnable {
 
     private final FeedConfig feedConfig;
 
-    private final URL url;
+    private final FeedReader reader;
+
+    private final FeedFilterProcessor processor;
+
+    private final FeedWriter writer;
 
     // TODO куда писать надо принимать снаружи, а снаружи ииметь холдер стримов
-
-    @SneakyThrows
     public FeedSyncTask(FeedConfig feedConfig) {
         this.feedConfig = feedConfig;
-        this.url = new URL(feedConfig.getUrl());
+
+        this.reader = new FeedReader(feedConfig);
+        this.processor = new FeedFilterProcessor(feedConfig);
+        this.writer = new FeedWriter(feedConfig);
     }
 
     @Override
     public void run() {
-        System.out.println("!!!!! run -> " + feedConfig.getUrl());
-        SyndFeed syndFeed = loadData();
-        writeFeed(syndFeed);
-    }
-
-    @SneakyThrows
-    private void writeFeed(SyndFeed syndFeed) {
-        try (
-            FileWriter fw = new FileWriter(feedConfig.getFileName(), true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw)
-        ) {
-            try {
-                for (SyndEntry entry : syndFeed.getEntries()) {
-                    writeEntry(out, entry);
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @SneakyThrows
-    private void writeEntry(PrintWriter out, SyndEntry entry) {
-        for (var extr : FieldExtractors.entryExt.entrySet()) {
-            out.write(extr.getKey() + ": ");
-
-            Object value = extr.getValue().apply(entry);
-            if (value != null) {
-                out.write(value.toString());
-            }
-            out.write("\n");
-        }
-    }
-
-    @SneakyThrows
-    private SyndFeed loadData() {
-        var xmlReader = new XmlReader(url);
-        var feedInput = new SyndFeedInput();
-        var feed = feedInput.build(xmlReader);
-        return feed;
+        log.info("Run sync for feed '{}'", feedConfig.getUrl());
+        final var originalFeed = reader.loadData();
+        final var filteredFeed = processor.filter(originalFeed);
+        writer.write(filteredFeed);
     }
 }

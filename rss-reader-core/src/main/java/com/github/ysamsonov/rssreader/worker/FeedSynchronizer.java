@@ -21,8 +21,11 @@ public class FeedSynchronizer {
 
     public void update(ReaderConfig config) {
         for (FeedConfig feed : config.getFeeds()) {
+            // TODO: открыть файлы тут и желательно держать их, но просто засунуть эту инфу в процессор ?? или врайтер
+            FeedSyncTask task = new FeedSyncTask(feed);
+
             executorService.scheduleAtFixedRate(
-                new FeedSyncTask(feed),
+                task,
                 10,
                 10,
                 TimeUnit.SECONDS

@@ -1,7 +1,5 @@
 package com.github.ysamsonov.rssreader.config;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

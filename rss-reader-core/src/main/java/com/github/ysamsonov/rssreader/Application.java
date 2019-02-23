@@ -44,9 +44,7 @@ public class Application {
     }
 
     private File getReaderConfigFile() {
-        return new File(
-            propertyResolver.getProperty("rssreader.config.location")
-                .orElse("reader-config.json")
-        );
+        String fileName = propertyResolver.getProperty("rssreader.config.location").orElse("reader-config.json");
+        return new File(fileName);
     }
 }

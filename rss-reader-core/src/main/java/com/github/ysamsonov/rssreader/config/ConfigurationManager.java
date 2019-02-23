@@ -39,6 +39,10 @@ public class ConfigurationManager {
         else {
             this.config = new ReaderConfig();
         }
-        System.out.println();
+    }
+
+    @SneakyThrows
+    public synchronized void persist() {
+        mapper.writeValue(configFile, config);
     }
 }
