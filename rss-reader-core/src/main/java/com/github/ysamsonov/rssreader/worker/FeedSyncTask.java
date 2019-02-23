@@ -1,6 +1,9 @@
 package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.github.ysamsonov.rssreader.worker.impl.FeedFilterProcessor;
+import com.github.ysamsonov.rssreader.worker.impl.FileFeedWriter;
+import com.github.ysamsonov.rssreader.worker.impl.UrlFeedReader;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,7 +17,7 @@ public class FeedSyncTask implements Runnable {
 
     private final FeedReader reader;
 
-    private final FeedFilterProcessor processor;
+    private final FeedProcessor processor;
 
     private final FeedWriter writer;
 
@@ -22,9 +25,9 @@ public class FeedSyncTask implements Runnable {
     public FeedSyncTask(FeedConfig feedConfig) {
         this.feedConfig = feedConfig;
 
-        this.reader = new FeedReader(feedConfig);
+        this.reader = new UrlFeedReader(feedConfig);
         this.processor = new FeedFilterProcessor(feedConfig);
-        this.writer = new FeedWriter(feedConfig);
+        this.writer = new FileFeedWriter(feedConfig);
     }
 
     @Override
@@ -32,7 +35,7 @@ public class FeedSyncTask implements Runnable {
         log.info("Run sync for feed '{}'", feedConfig.getUrl());
         try {
             final var originalFeed = reader.loadData();
-            final var filteredFeed = processor.filter(originalFeed);
+            final var filteredFeed = processor.process(originalFeed);
             writer.write(filteredFeed);
         }
         catch (Exception e) {

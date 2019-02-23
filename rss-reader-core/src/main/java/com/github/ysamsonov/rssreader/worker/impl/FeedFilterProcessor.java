@@ -1,6 +1,7 @@
-package com.github.ysamsonov.rssreader.worker;
+package com.github.ysamsonov.rssreader.worker.impl;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.github.ysamsonov.rssreader.worker.FeedProcessor;
 import com.rometools.rome.feed.synd.SyndFeed;
 
 import java.util.Date;
@@ -10,7 +11,7 @@ import java.util.Optional;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
-public class FeedFilterProcessor {
+public class FeedFilterProcessor implements FeedProcessor {
 
     private final FeedConfig feedConfig;
 
@@ -18,7 +19,8 @@ public class FeedFilterProcessor {
         this.feedConfig = feedConfig;
     }
 
-    public SyndFeed filter(SyndFeed feed) {
+    @Override
+    public SyndFeed process(SyndFeed feed) {
         if (feed == null) {
             return null;
         }
