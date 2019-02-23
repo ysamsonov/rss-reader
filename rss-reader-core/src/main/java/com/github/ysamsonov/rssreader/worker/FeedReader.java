@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.URL;
 
 /**
- * @author Yuriy A. Samsonov <y.samsonov@erpscan.com>
+ * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
 @Slf4j

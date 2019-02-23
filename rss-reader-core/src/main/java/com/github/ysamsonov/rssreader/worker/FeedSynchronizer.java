@@ -24,7 +24,7 @@ public class FeedSynchronizer {
             // TODO: открыть файлы тут и желательно держать их, но просто засунуть эту инфу в процессор ?? или врайтер
             FeedSyncTask task = new FeedSyncTask(feed);
 
-            executorService.scheduleAtFixedRate(
+            executorService.scheduleWithFixedDelay(
                 task,
                 10,
                 10,

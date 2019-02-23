@@ -30,8 +30,14 @@ public class FeedSyncTask implements Runnable {
     @Override
     public void run() {
         log.info("Run sync for feed '{}'", feedConfig.getUrl());
-        final var originalFeed = reader.loadData();
-        final var filteredFeed = processor.filter(originalFeed);
-        writer.write(filteredFeed);
+        try {
+            final var originalFeed = reader.loadData();
+            final var filteredFeed = processor.filter(originalFeed);
+            writer.write(filteredFeed);
+        }
+        catch (Exception e) {
+            // TODO: fix it!
+            e.printStackTrace();
+        }
     }
 }

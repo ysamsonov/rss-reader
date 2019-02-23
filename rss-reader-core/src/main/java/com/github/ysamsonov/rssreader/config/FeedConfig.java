@@ -2,9 +2,11 @@ package com.github.ysamsonov.rssreader.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -13,6 +15,7 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@Accessors(chain = true)
 public class FeedConfig {
 
     private String url;
@@ -22,6 +25,11 @@ public class FeedConfig {
     private String fileName;
 
     private Collection<String> fields = new ArrayList<>();
+
+    private Date lastFetchDate;
+
+    public FeedConfig() {
+    }
 
     @Override
     public boolean equals(Object o) {

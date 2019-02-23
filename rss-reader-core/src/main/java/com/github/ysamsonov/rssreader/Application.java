@@ -41,6 +41,8 @@ public class Application {
 
         System.out.println("await");
         scanner.nextLine();
+        // TODO: terminate correctly
+        System.exit(0);
     }
 
     private File getReaderConfigFile() {
