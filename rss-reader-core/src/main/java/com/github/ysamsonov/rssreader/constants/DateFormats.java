@@ -1,7 +1,7 @@
 package com.github.ysamsonov.rssreader.constants;
 
 /**
- * @author Yuriy A. Samsonov <y.samsonov@erpscan.com>
+ * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
 public final class DateFormats {

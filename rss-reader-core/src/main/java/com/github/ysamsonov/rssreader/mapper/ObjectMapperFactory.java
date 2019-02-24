@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
- * @author Yuriy A. Samsonov <y.samsonov@erpscan.com>
+ * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
 public class ObjectMapperFactory {

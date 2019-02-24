@@ -2,6 +2,7 @@ package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -50,14 +51,20 @@ public class DelayParser {
 
     private long parseTime(String delay) {
         try {
-            return Long.parseLong(delay);
+            long time = Long.parseLong(delay);
+            if (time <= 0) {
+                throw new RssReaderException("Delay should be greater than zero!");
+            }
+            return time;
         }
         catch (NumberFormatException e) {
             throw new RssReaderException("Cannot parse time from %s. %s", delay, e.getMessage());
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     @Getter
+    @EqualsAndHashCode
     @AllArgsConstructor(staticName = "of")
     public static class Delay {
         private final long delay;
