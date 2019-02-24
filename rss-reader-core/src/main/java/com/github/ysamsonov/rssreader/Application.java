@@ -2,6 +2,7 @@ package com.github.ysamsonov.rssreader;
 
 import com.github.ysamsonov.rssreader.cli.CliInterface;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
+import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.helpers.PropertyResolver;
 import com.github.ysamsonov.rssreader.worker.FeedSynchronizer;
 import lombok.Getter;
@@ -25,9 +26,12 @@ public class Application {
 
     private final CliInterface cliInterface;
 
+    private final ApplicationEventPublisherImpl eventPublisher;
+
     private Application() {
+        this.eventPublisher = new ApplicationEventPublisherImpl();
         this.propertyResolver = new PropertyResolver();
-        this.configurationManager = new ConfigurationManager(getReaderConfigFile());
+        this.configurationManager = new ConfigurationManager(getReaderConfigFile(), eventPublisher);
         this.feedSynchronizer = new FeedSynchronizer(getThreadCount());
         this.cliInterface = new CliInterface(configurationManager, this::exit);
     }
@@ -40,7 +44,12 @@ public class Application {
     }
 
     private Application init() {
-        feedSynchronizer.update(configurationManager.getConfig());
+        eventPublisher.subscribe(CreateFeedEvent.class, feedSynchronizer::onCreateFeed);
+        eventPublisher.subscribe(EditFeedEvent.class, feedSynchronizer::onEditFeed);
+        eventPublisher.subscribe(DeleteFeedEvent.class, feedSynchronizer::onDeleteFeed);
+        eventPublisher.subscribe(SwitchStateFeedEvent.class, feedSynchronizer::onSwitchStateFeed);
+
+        feedSynchronizer.onStart(configurationManager.getConfig());
         return this;
     }
 
@@ -49,7 +58,11 @@ public class Application {
     }
 
     private void exit() {
-        // TODO: terminate correctly
+        System.out.println("Start shutdown");
+        feedSynchronizer.onShutdown();
+        configurationManager.onShutdown();
+
+        System.out.println("Shutdown");
         System.exit(0);
     }
 
@@ -59,6 +72,6 @@ public class Application {
     }
 
     private int getThreadCount() {
-        return propertyResolver.getProperty("rssreader.feed.synchronizer.pool.size", Integer.class).orElse(1);
+        return propertyResolver.getProperty("rssreader.feed.synchronizer.pool.size", Integer.class).orElse(4);
     }
 }

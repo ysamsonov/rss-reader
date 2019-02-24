@@ -10,6 +10,7 @@ import java.util.Scanner;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
+@SuppressWarnings("WeakerAccess")
 @AllArgsConstructor
 public class Menu {
 
@@ -24,10 +25,11 @@ public class Menu {
         try {
             awaitAction();
         }
-        catch (Exception ignore) {
-            // something went wrong, repeat awaiting
-            System.out.println("Error during execute command!\n\n");
-            //TODO : надо чтото сделать так не круто))
+        catch (Exception e) {
+            System.out.println(String.format(
+                "Error during execute command! Error: %s. Try again.\n\n",
+                e.getMessage()
+            ));
         }
     }
 

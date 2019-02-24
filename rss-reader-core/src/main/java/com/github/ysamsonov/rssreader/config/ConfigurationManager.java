@@ -3,6 +3,8 @@ package com.github.ysamsonov.rssreader.config;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +23,21 @@ public class ConfigurationManager {
         .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
         .enable(JsonParser.Feature.ALLOW_COMMENTS)
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .enable(SerializationFeature.INDENT_OUTPUT);
+
+    private final Object monitor = new Object();
 
     private final File configFile;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Getter
     private ReaderConfig config;
 
-    public ConfigurationManager(File configFile) {
+    public ConfigurationManager(File configFile, ApplicationEventPublisher eventPublisher) {
         this.configFile = configFile;
+        this.eventPublisher = eventPublisher;
 
         load();
     }
@@ -57,43 +65,59 @@ public class ConfigurationManager {
     }
 
     public void addFeed(FeedConfig feed) {
+        eventPublisher.publish(new CreateFeedEvent(feed, config));
+
         config.addFeed(feed);
-        // TODO: call refresh
-        // TODO: call persiste
+        persist();
     }
 
-    public void updateFeed(int feedNum, FeedConfig feedConfig) {
-        config.getFeeds().set(feedNum, feedConfig);
-        // TODO: call refresh
-        // TODO: call persiste
+    public void updateFeed(int feedNum, FeedConfig feed) {
+        // need to update last fetch date before run new task
+        feed.setLastFetchDate(config.getFeeds().get(feedNum).getLastFetchDate());
+
+        eventPublisher.publish(new EditFeedEvent(feed, config));
+
+        config.getFeeds().set(feedNum, feed);
+        persist();
     }
 
     public void deleteFeed(int feedNum) {
+        FeedConfig feed = config.getFeeds().get(feedNum);
+        eventPublisher.publish(new DeleteFeedEvent(feed));
+
         config.deleteFeed(feedNum);
-        // TODO: call refresh
-        // TODO: call persiste
+        persist();
     }
 
     public void switchStateFeed(int feedNum) {
+        FeedConfig feed = config.getFeeds().get(feedNum);
+        eventPublisher.publish(new SwitchStateFeedEvent(feed, !feed.isEnabled(), config));
+
         config.getFeeds().get(feedNum).invertState();
-        // TODO: call refresh
-        // TODO: call persiste
+        persist();
     }
 
-    public synchronized void persist() {
-        try {
-            mapper.writeValue(configFile, config);
-        }
-        catch (IOException e) {
-            String msg = String.format(
-                "Error during persist configuration to file '%s'. %s",
-                configFile.getPath(),
-                e.getMessage()
-            );
+    public void onShutdown() {
+        persist();
+    }
 
-            log.error(msg);
-            log.error(msg, e);
-            throw new RssReaderException(msg, e);
+    // TODO: надо переодически сбрасывать в файлы
+    private void persist() {
+        synchronized (monitor) {
+            try {
+                mapper.writeValue(configFile, config);
+            }
+            catch (IOException e) {
+                String msg = String.format(
+                    "Error during persist configuration to file '%s'. %s",
+                    configFile.getPath(),
+                    e.getMessage()
+                );
+
+                log.error(msg);
+                log.error(msg, e);
+                throw new RssReaderException(msg, e);
+            }
         }
     }
 }

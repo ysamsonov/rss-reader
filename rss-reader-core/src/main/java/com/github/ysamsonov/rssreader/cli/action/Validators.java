@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 final class Validators {
 
     static Predicate<Integer> feedNumber(ConfigurationManager cm) {
-        return num -> num > 0 && cm.getConfig().getFeeds().size() <= num;
+        return num -> 0 < num && num <= cm.getConfig().getFeeds().size();
     }
 
     static Predicate<String> link(ConfigurationManager configurationManager) {
