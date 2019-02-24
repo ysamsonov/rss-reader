@@ -1,15 +1,12 @@
 package com.github.ysamsonov.rssreader;
 
+import com.github.ysamsonov.rssreader.cli.CliInterface;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.helpers.PropertyResolver;
 import com.github.ysamsonov.rssreader.worker.FeedSynchronizer;
 import lombok.Getter;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Scanner;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
@@ -26,10 +23,13 @@ public class Application {
 
     private final FeedSynchronizer feedSynchronizer;
 
+    private final CliInterface cliInterface;
+
     private Application() {
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile());
         this.feedSynchronizer = new FeedSynchronizer(getThreadCount());
+        this.cliInterface = new CliInterface(configurationManager);
     }
 
     public static void main(String[] args) {
@@ -45,79 +45,11 @@ public class Application {
     }
 
     private void run() {
-        Scanner scanner = new Scanner(System.in);
-        printBanner();
-        printMainMenu(scanner);
-    }
-
-    private void printBanner() {
-        var stream = getClass().getClassLoader().getResourceAsStream("banner.txt");
-        if (stream == null) {
-            System.out.println("RSS Reader");
-            return;
-        }
-
-        try (
-            stream;
-            var reader = new InputStreamReader(stream);
-            var buffReader = new BufferedReader(reader)
-        ) {
-            String line;
-            while ((line = buffReader.readLine()) != null) {
-                System.out.println(line);
-            }
-            System.out.print("\n\n\n");
-        }
-        catch (IOException ignore) {
-            System.out.println("RSS Reader");
-        }
-    }
-
-    private void printMainMenu(Scanner scanner) {
-        System.out.println("Menu");
-        System.out.println("[1] View list of feeds");
-        System.out.println("[2] Add new feed");
-        System.out.println("[3] Edit feed");
-        System.out.println("[4] Enable/Disable feed");
-        System.out.println("[5] Exit");
-        System.out.println("Please enter command and press enter: ");
-
-        while (true) {
-            String line = scanner.nextLine();
-            switch (line.trim()) {
-                case "1":
-                case "l":
-                    //print list
-                    break;
-
-                case "2":
-                case "a":
-                    // add feed
-                    break;
-
-                case "3":
-                case "e":
-                    // edit
-                    break;
-
-                case "4":
-                    // enable/disable
-                    break;
-
-                case "5":
-                case "q":
-                    // TODO: terminate correctly
-                    System.exit(0);
-
-                default:
-                    System.out.println("Incorrect command!");
-                    break;
-            }
-        }
+        cliInterface.show();
     }
 
     private File getReaderConfigFile() {
-        String fileName = propertyResolver.getProperty("rssreader.config.location").orElse("empty-config.json");
+        String fileName = propertyResolver.getProperty("rssreader.config.location").orElse("reader-config.json");
         return new File(fileName);
     }
 

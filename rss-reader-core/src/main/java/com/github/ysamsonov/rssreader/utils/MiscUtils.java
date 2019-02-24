@@ -18,4 +18,14 @@ public final class MiscUtils {
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        }
+        catch (NumberFormatException ignore) {
+            return false;
+        }
+    }
 }

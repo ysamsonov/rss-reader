@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
@@ -14,7 +14,7 @@ import java.util.Collection;
 @Setter
 public class ReaderConfig {
 
-    private Collection<FeedConfig> feeds = new ArrayList<>();
+    private List<FeedConfig> feeds = new ArrayList<>();
 
     private int fetchCount = 10;
 
