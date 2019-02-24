@@ -1,11 +1,9 @@
 package com.github.ysamsonov.rssreader.config;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
+import com.github.ysamsonov.rssreader.mapper.ObjectMapperFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,18 +17,13 @@ import java.io.IOException;
 @Slf4j
 public class ConfigurationManager {
 
-    private final ObjectMapper mapper = new ObjectMapper()
-        .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
-        .enable(JsonParser.Feature.ALLOW_COMMENTS)
-        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .enable(SerializationFeature.INDENT_OUTPUT);
-
     private final Object monitor = new Object();
 
     private final File configFile;
 
     private final ApplicationEventPublisher eventPublisher;
+
+    private final ObjectMapper mapper;
 
     @Getter
     private ReaderConfig config;
@@ -38,6 +31,8 @@ public class ConfigurationManager {
     public ConfigurationManager(File configFile, ApplicationEventPublisher eventPublisher) {
         this.configFile = configFile;
         this.eventPublisher = eventPublisher;
+
+        this.mapper = new ObjectMapperFactory().create();
 
         load();
     }
