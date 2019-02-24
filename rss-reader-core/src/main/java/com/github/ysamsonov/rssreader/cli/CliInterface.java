@@ -1,5 +1,9 @@
 package com.github.ysamsonov.rssreader.cli;
 
+import com.github.ysamsonov.rssreader.cli.action.AddFeedAction;
+import com.github.ysamsonov.rssreader.cli.action.DeleteFeedAction;
+import com.github.ysamsonov.rssreader.cli.action.EditFeedAction;
+import com.github.ysamsonov.rssreader.cli.action.SwitchStateFeedAction;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 
@@ -15,24 +19,25 @@ public class CliInterface {
 
     private final ConfigurationManager configurationManager;
 
-    private final Scanner scanner;
-
     private final Menu mainMenu;
 
     public CliInterface(
-        ConfigurationManager configurationManager
+        ConfigurationManager configurationManager,
+        Command.Action exitAction
     ) {
         this.configurationManager = configurationManager;
-        this.scanner = new Scanner(System.in);
+
+        var scanner = new Scanner(System.in);
         this.mainMenu = new Menu(
             scanner,
             "Menu",
             Arrays.asList(
                 new Command("View list of feeds", this::feedList),
                 new Command("Add new feed", new AddFeedAction(scanner, configurationManager)),
-                new Command("Edit feed", new EditFeedAction(scanner)),
-                new Command("Enable/Disable feed", this::switchState),
-                new Command("Exit", this::exit)
+                new Command("Edit feed", new EditFeedAction(scanner, configurationManager)),
+                new Command("Enable/Disable feed", new SwitchStateFeedAction(scanner, configurationManager)),
+                new Command("Delete feed", new DeleteFeedAction(scanner, configurationManager)),
+                new Command("Exit", exitAction)
             )
         );
     }
@@ -74,16 +79,15 @@ public class CliInterface {
                 "\tFields: %s",
                 String.join("; ", feed.getFields())
             ));
+            System.out.println(String.format(
+                "\tFetch time: %s",
+                feed.getFetchTime() != null ? feed.getFetchTime() : "default"
+            ));
+            System.out.println(String.format(
+                "\tEnabled: %s",
+                feed.isEnabled() ? "yes" : "no"
+            ));
             System.out.print("\n");
         }
-    }
-
-    private void switchState() {
-
-    }
-
-    private void exit() {
-        // TODO: terminate correctly
-        System.exit(0);
     }
 }

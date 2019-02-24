@@ -35,6 +35,10 @@ public class FeedConfig {
     public FeedConfig() {
     }
 
+    public void invertState() {
+        this.enabled = !this.enabled;
+    }
+
     public Predicate<String> fieldPredicate() {
         if (MiscUtils.isNullOrEmpty(getFields())) {
             return $ -> true;

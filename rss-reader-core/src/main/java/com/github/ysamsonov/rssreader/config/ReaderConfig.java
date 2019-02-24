@@ -19,4 +19,12 @@ public class ReaderConfig {
     private int fetchCount = 10;
 
     private String fetchTime = "10m";
+
+    public void addFeed(FeedConfig feed) {
+        this.feeds.add(feed);
+    }
+
+    public void deleteFeed(int feedNum) {
+        this.feeds.remove(feedNum);
+    }
 }

@@ -56,6 +56,30 @@ public class ConfigurationManager {
         }
     }
 
+    public void addFeed(FeedConfig feed) {
+        config.addFeed(feed);
+        // TODO: call refresh
+        // TODO: call persiste
+    }
+
+    public void updateFeed(int feedNum, FeedConfig feedConfig) {
+        config.getFeeds().set(feedNum, feedConfig);
+        // TODO: call refresh
+        // TODO: call persiste
+    }
+
+    public void deleteFeed(int feedNum) {
+        config.deleteFeed(feedNum);
+        // TODO: call refresh
+        // TODO: call persiste
+    }
+
+    public void switchStateFeed(int feedNum) {
+        config.getFeeds().get(feedNum).invertState();
+        // TODO: call refresh
+        // TODO: call persiste
+    }
+
     public synchronized void persist() {
         try {
             mapper.writeValue(configFile, config);

@@ -29,7 +29,7 @@ public class Application {
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile());
         this.feedSynchronizer = new FeedSynchronizer(getThreadCount());
-        this.cliInterface = new CliInterface(configurationManager);
+        this.cliInterface = new CliInterface(configurationManager, this::exit);
     }
 
     public static void main(String[] args) {
@@ -46,6 +46,11 @@ public class Application {
 
     private void run() {
         cliInterface.show();
+    }
+
+    private void exit() {
+        // TODO: terminate correctly
+        System.exit(0);
     }
 
     private File getReaderConfigFile() {
