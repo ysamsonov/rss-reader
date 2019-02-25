@@ -1,7 +1,7 @@
 # RSS Reader
 
 # Usage
-First of all, clone this repo and go to the project directory.
+First of all, clone this repo and go to the project directory.  
 After that there are several options how to run.
 
 ## Pre-requirements
@@ -61,7 +61,7 @@ gradlew.bat :rss-reader-core:fatJar
 ```
 </li>
 
-<li>Go to `rss-reader-core/build/libs` folder and take jar-file</li>
+<li>Go to <code>rss-reader-core/build/libs</code> folder and take jar-file</li>
 </ol>
 
 # Contributing
