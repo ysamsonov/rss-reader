@@ -1,10 +1,8 @@
 package com.github.ysamsonov.rssreader.cli.action;
 
 import com.github.ysamsonov.rssreader.cli.Command;
-import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Objects;
 import java.util.Scanner;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -54,17 +52,5 @@ abstract class BaseConsoleAction implements Command.Action {
             }
             System.out.println("Incorrect format of value. Please repeat.");
         }
-    }
-
-    boolean parseBoolean(String val) {
-        if (Objects.equals(val, "y") || Objects.equals(val, "yes")) {
-            return true;
-        }
-
-        if (Objects.equals(val, "n") || Objects.equals(val, "no")) {
-            return false;
-        }
-
-        throw new RssReaderException("Unknown value '%s'", val);
     }
 }

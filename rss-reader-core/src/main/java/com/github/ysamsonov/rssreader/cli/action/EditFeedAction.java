@@ -39,7 +39,7 @@ public class EditFeedAction extends BaseConsoleAction {
 
         boolean enabled = read(
             String.format("Enabled (y/n)? (current: %s)", originalFeedConfig.isEnabled() ? "yes" : "no"),
-            this::parseBoolean,
+            Parsers.booleanVal(),
             f -> true,
             originalFeedConfig.isEnabled()
         );

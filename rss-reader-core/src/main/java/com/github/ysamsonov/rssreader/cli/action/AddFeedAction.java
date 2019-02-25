@@ -4,7 +4,9 @@ import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Scanner;
 import java.util.function.Function;
 
 /**
@@ -38,14 +40,14 @@ public class AddFeedAction extends BaseConsoleAction {
 
         boolean enabled = read(
             "Enabled (y/n)? (yes by default)",
-            this::parseBoolean,
+            Parsers.booleanVal(),
             f -> true,
             true
         );
 
         Collection<String> fields = read(
             String.format("Fields to write: (allowed: %s)", String.join(", ", FieldExtractors.entryExt.keySet())),
-            f -> new HashSet<>(Arrays.asList(f.split(" "))),
+            Parsers.fields(),
             Validators.fields(),
             Collections.emptyList()
         );
