@@ -3,6 +3,8 @@ package com.github.ysamsonov.rssreader.helpers;
 import com.github.ysamsonov.rssreader.utils.MapBuilder;
 import com.rometools.rome.feed.synd.*;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,36 +16,53 @@ import java.util.stream.Collectors;
 public final class FieldExtractors {
 
     public static final Map<String, Function<SyndFeed, String>> feedExt = MapBuilder.<String, Function<SyndFeed, String>>create()
+        .put("icon", nullSafe(SyndFeed::getIcon, SyndImage::getUrl))
+        .put("image", nullSafe(SyndFeed::getImage, SyndImage::getUrl))
         .put("copyright", SyndFeed::getCopyright)
         .put("generator", SyndFeed::getGenerator)
-        .put("image", f -> f.getImage() != null ? f.getImage().getUrl() : null)
-        .put("icon", f -> f.getIcon() != null ? f.getIcon().getUrl() : null)
         .buildImmutable();
 
-    public static final Map<String, Function<SyndEntry, String>> entryExt = MapBuilder.<String, Function<SyndEntry, String>>create()
-        .put("uri", SyndEntry::getUri)
+    public static final Map<String, Function<SyndEntry, String>> entryExt = MapBuilder.<String, Function<SyndEntry, String>>createLinkedHashMap()
         .put("title", SyndEntry::getTitle)
+        .put("description", nullSafe(SyndEntry::getDescription, SyndContent::getValue))
+        .put("contents", mapCollection(SyndEntry::getContents, SyndContent::getValue))
+        .put("uri", SyndEntry::getUri)
         .put("link", SyndEntry::getLink) //links
-        .put("description", e -> e.getDescription() != null ? e.getDescription().getValue() : null)
-        .put(
-            "contents",
-            $ -> $.getContents().stream().map(SyndContent::getValue).collect(Collectors.joining("; "))
-        )
-        .put(
-            "enclosures",
-            $ -> $.getEnclosures().stream().map(SyndEnclosure::getUrl).collect(Collectors.joining("; "))
-        )
-        .put("publishedDate", s -> s.getPublishedDate() != null ? s.getPublishedDate().toString() : null)
-        .put("updatedDate", s -> s.getUpdatedDate() != null ? s.getUpdatedDate().toString() : null)
+        .put("enclosures", mapCollection(SyndEntry::getEnclosures, SyndEnclosure::getUrl))
+        .put("publishedDate", nullSafe(SyndEntry::getPublishedDate, Date::toString))
+        .put("updatedDate", nullSafe(SyndEntry::getUpdatedDate, Date::toString))
         .put("author", SyndEntry::getAuthor) // authors
-        .put(
-            "contributors",
-            $ -> $.getContributors().stream().map(SyndPerson::getName).collect(Collectors.joining("; "))
-        )
-        .put(
-            "categories",
-            $ -> $.getCategories().stream().map(SyndCategory::getName).collect(Collectors.joining("; "))
-        )
+        .put("contributors", mapCollection(SyndEntry::getContributors, SyndPerson::getName))
+        .put("categories", mapCollection(SyndEntry::getCategories, SyndCategory::getName))
         .put("comments", SyndEntry::getComments)
         .buildImmutable();
+
+    private static <T, R, RES> Function<T, RES> nullSafe(
+        Function<T, R> left,
+        Function<R, RES> right
+    ) {
+        return val -> {
+            if (val == null) {
+                return null;
+            }
+
+            R fRes = left.apply(val);
+            return fRes != null ? right.apply(fRes) : null;
+        };
+    }
+
+    private static <T, ET> Function<T, String> mapCollection(
+        Function<T, Collection<ET>> collectionExtractor,
+        Function<ET, String> mapper
+    ) {
+        return nullSafe(
+            collectionExtractor,
+            collection ->
+                collection
+                    .stream()
+                    .map(mapper)
+                    .map(v -> v != null ? v : "")
+                    .collect(Collectors.joining("; "))
+        );
+    }
 }

@@ -120,7 +120,7 @@ public class FeedSynchronizer {
         future.cancel(true);
     }
 
-    private void cleanUpWriterLocks() {
-        // TODO: cleaunup
+    private void cleanupWriterLocks() {
+        // TODO: cleanup
     }
 }
