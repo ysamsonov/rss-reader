@@ -47,7 +47,10 @@ java -Drssreader.feed.synchronizer.pool.size=1 -jar rss-reader-core.jar
 ```
 
 # Build
-1. Run command to build Fat Jar  
+<ol>
+<li>
+Run command to build Fat Jar
+
 For Linux/MacOS use bash command:  
 ```bash
 ./gradlew :rss-reader-core:fatJar
@@ -56,7 +59,10 @@ For Windows use cmd command:
 ```batch
 gradlew.bat :rss-reader-core:fatJar
 ```
-1. Go to `rss-reader-core/build/libs` folder and take jar-file
+</li>
+
+<li>Go to `rss-reader-core/build/libs` folder and take jar-file</li>
+</ol>
 
 # Contributing
 Contributions are always welcome!
