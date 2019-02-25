@@ -59,6 +59,7 @@ public class Application {
 
     private void exit() {
         System.out.println("Start shutdown");
+
         feedSynchronizer.onShutdown();
         configurationManager.onShutdown();
 

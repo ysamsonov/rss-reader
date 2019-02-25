@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.mapper.ObjectMapperFactory;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -25,7 +24,6 @@ public class ConfigurationManager {
 
     private final ObjectMapper mapper;
 
-    @Getter
     private ReaderConfig config;
 
     public ConfigurationManager(File configFile, ApplicationEventPublisher eventPublisher) {
@@ -92,7 +90,12 @@ public class ConfigurationManager {
         persist();
     }
 
+    public ReaderConfig getConfig() {
+        return config;
+    }
+
     public void onShutdown() {
+        log.info("Persist configuration on shutdown");
         persist();
     }
 

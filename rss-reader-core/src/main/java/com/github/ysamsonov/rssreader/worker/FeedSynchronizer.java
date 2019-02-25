@@ -2,10 +2,8 @@ package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.config.ReaderConfig;
-import com.github.ysamsonov.rssreader.event.CreateFeedEvent;
-import com.github.ysamsonov.rssreader.event.DeleteFeedEvent;
-import com.github.ysamsonov.rssreader.event.EditFeedEvent;
-import com.github.ysamsonov.rssreader.event.SwitchStateFeedEvent;
+import com.github.ysamsonov.rssreader.event.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
+@Slf4j
 public class FeedSynchronizer {
 
     private final DelayParser delayParser = new DelayParser();
@@ -53,6 +52,7 @@ public class FeedSynchronizer {
     }
 
     public void onShutdown() {
+        log.info("Shutdown executor service");
         this.executorService.shutdown();
     }
 
