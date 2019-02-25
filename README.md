@@ -38,7 +38,7 @@ The following options are available for application.
 
 |Name|Description|Default value|
 |---|---|---|
-|`rssreader.config.location`|Configuration file location|`${workdir}/reader-config.json`|
+|`rssreader.config.location`|Configuration file location|`$(pwd)/reader-config.json`|
 |`rssreader.feed.synchronizer.pool.size`|Pool size for feed synchronization|4|
 
 Example of using:
