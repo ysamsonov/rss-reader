@@ -54,8 +54,34 @@ subprojects {
         testImplementation 'org.mockito:mockito-core:2.23.0'
         testImplementation 'org.mockito:mockito-junit-jupiter:2.18.3'
     }
+
+    test {
+        useJUnitPlatform()
+    }
 }
 
 project(":rss-reader-core") {
+    apply plugin: 'application'
 
+    mainClassName = 'com.github.ysamsonov.rssreader.Application'
+
+    task runApp(type: JavaExec, group: 'application') {
+        classpath = sourceSets.main.runtimeClasspath
+        main = mainClassName
+    }
+
+    task fatJar(type: Jar, group: 'build') {
+        manifest {
+            attributes 'Main-Class': mainClassName
+        }
+
+        from {
+            configurations.runtimeClasspath.collect {
+                println "FatJar include: ${it}"
+                it.isDirectory() ? it : zipTree(it)
+            }
+        }
+
+        with jar
+    }
 }
