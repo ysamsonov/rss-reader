@@ -5,7 +5,9 @@ buildscript {
         lombokVersion = "1.18.4"
         romeVersion = "1.12.0"
 
+        assertjVersion = "3.12.0"
         junitJupiterVersion = "5.4.0"
+        mockitoVersion = "2.24.5"
     }
 
     repositories {
@@ -49,10 +51,10 @@ subprojects {
         testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 
-        testImplementation 'org.assertj:assertj-core:3.11.1'
+        testImplementation "org.assertj:assertj-core:${assertjVersion}"
 
-        testImplementation 'org.mockito:mockito-core:2.23.0'
-        testImplementation 'org.mockito:mockito-junit-jupiter:2.18.3'
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
     }
 
     test {
