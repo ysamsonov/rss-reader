@@ -27,7 +27,7 @@ public class FeedSynchronizer {
 
     private final ScheduledExecutorService executorService;
 
-    private final FeedSyncTaskFactory syncTaskFactory = new FeedSyncTaskFactory();
+    private final FeedSyncTaskFactory syncTaskFactory;
 
     // feed unique name -> future
     private final Map<String, ScheduledFuture<?>> runningTasks = new ConcurrentHashMap<>();
@@ -37,8 +37,9 @@ public class FeedSynchronizer {
 
     private final Object monitor = new Object();
 
-    public FeedSynchronizer(int poolSize) {
+    public FeedSynchronizer(int poolSize, FeedSyncTaskFactory syncTaskFactory) {
         this.executorService = Executors.newScheduledThreadPool(poolSize);
+        this.syncTaskFactory = syncTaskFactory;
     }
 
     /**

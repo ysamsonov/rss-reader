@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
-class FeedSyncTaskFactory {
+public class FeedSyncTaskFactory {
 
     FeedSyncTask create(FeedConfig feedConfig, ReentrantLock writeLock) {
         var reader = new UrlFeedReader(feedConfig);
