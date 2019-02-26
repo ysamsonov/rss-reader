@@ -20,8 +20,9 @@ public class ReaderConfig {
 
     private String fetchTime = "10m";
 
-    public void addFeed(FeedConfig feed) {
+    public ReaderConfig addFeed(FeedConfig feed) {
         this.feeds.add(feed);
+        return this;
     }
 
     public void deleteFeed(int feedNum) {

@@ -1,5 +1,5 @@
 <configuration scan="true" scanPeriod="10 seconds">
-    <property name="LOG_PATTERN" value="%d{yyyy.MM.dd'T'HH:mm:ss.SSSZ} [%thread] %-5level %logger{5} - %msg%n" />
+    <property name="LOG_PATTERN" value="%d{yyyy.MM.dd'T'HH:mm:ss.SSSZ} [%thread] %-5level %logger{5} - %msg%n"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

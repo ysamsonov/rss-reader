@@ -4,7 +4,7 @@ import com.github.ysamsonov.rssreader.cli.CliInterface;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.helpers.PropertyResolver;
-import com.github.ysamsonov.rssreader.worker.FeedSyncTaskFactory;
+import com.github.ysamsonov.rssreader.worker.BaseFeedSyncTaskFactory;
 import com.github.ysamsonov.rssreader.worker.FeedSynchronizer;
 import lombok.Getter;
 
@@ -33,7 +33,7 @@ public class Application {
         this.eventPublisher = new ApplicationEventPublisherImpl();
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile(), eventPublisher);
-        this.feedSynchronizer = new FeedSynchronizer(getThreadCount(), new FeedSyncTaskFactory());
+        this.feedSynchronizer = new FeedSynchronizer(getThreadCount(), new BaseFeedSyncTaskFactory());
         this.cliInterface = new CliInterface(configurationManager, this::exit);
     }
 

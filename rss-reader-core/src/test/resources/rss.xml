@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0">
+    <channel>
+        <title>Яндекс.Новости: Спорт</title>
+        <link>https://news.yandex.ru/sport.html?from=rss</link>
+        <description>Первая в России служба автоматической обработки и систематизации новостей. Сообщения ведущих
+            российских и мировых СМИ. Обновление в режиме реального времени 24 часа в сутки.
+        </description>
+        <image>
+            <url>https://company.yandex.ru/i/50x23.gif</url>
+            <link>https://news.yandex.ru/sport.html?from=rss</link>
+            <title>Яндекс.Новости: Спорт</title>
+        </image>
+        <lastBuildDate>26 Feb 2019 19:25:06 +0000</lastBuildDate>
+        <item>
+            <title>Роджерс назначен главным тренером «Лестера»</title>
+            <link>
+                https://news.yandex.ru/story/Rodzhers_naznachen_glavnym_trenerom_Lestera--1c7a3ff3d480337faabf2fc1ccde3dfa?lang=ru&amp;from=rss&amp;stid=dXCGpYAMbTKEtgFz8INS
+            </link>
+            <guid>
+                https://news.yandex.ru/story/Rodzhers_naznachen_glavnym_trenerom_Lestera--1c7a3ff3d480337faabf2fc1ccde3dfa?lang=ru&amp;from=rss&amp;stid=dXCGpYAMbTKEtgFz8INS
+            </guid>
+            <description>«Лестер» объявил о назначении Брендана Роджерса главным тренером клуба. Предыдущим местом
+                работы 46-летнего специалиста был «Селтик».
+            </description>
+            <pubDate>26 Feb 2019 19:11:00 +0000</pubDate>
+        </item>
+        <item>
+            <title>«Спартак» обыграл СКА в первом матче серии плей-офф</title>
+            <link>
+                https://news.yandex.ru/story/Spartak_obygral_SKA_v_pervom_matche_serii_plej-off--9e460ee35e85a03017a2a3671885daa9?lang=ru&amp;from=rss&amp;stid=3bq50o2iqa_oTkUG3VEd
+            </link>
+            <guid>
+                https://news.yandex.ru/story/Spartak_obygral_SKA_v_pervom_matche_serii_plej-off--9e460ee35e85a03017a2a3671885daa9?lang=ru&amp;from=rss&amp;stid=3bq50o2iqa_oTkUG3VEd
+            </guid>
+            <description>Хоккеисты петербургского СКА дома проиграли московскому &amp;quot;Спартаку&amp;quot; в первом
+                матче серии 1/8 финала плей-офф КХЛ.
+            </description>
+            <pubDate>26 Feb 2019 19:14:47 +0000</pubDate>
+        </item>
+    </channel>
+</rss>
