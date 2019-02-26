@@ -13,7 +13,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Yuriy A. Samsonov <y.samsonov@erpscan.com>
+ * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-26
  */
 class ValidatorsTest {

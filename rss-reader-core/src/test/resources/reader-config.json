@@ -1,0 +1,28 @@
+{
+  "feeds": [
+    {
+      "url": "https://news.yandex.ru/sport.rss",
+      "enabled": true,
+      "fileName": "news.txt",
+      "fields": [
+        "title",
+        "description"
+      ],
+      "fetchTime": "10s"
+    },
+    {
+      "url": "https://news.yandex.ru/auto.rss",
+      "enabled": false,
+      "fileName": "auto.txt",
+      "fetchTime": "10m"
+    },
+    {
+      "url": "https://news.yandex.ru/science.rss",
+      "enabled": false,
+      "fileName": "news.txt",
+      "fetchTime": "1d"
+    }
+  ],
+  "fetchCount": 100,
+  "fetchTime": "1h"
+}
