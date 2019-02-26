@@ -1,4 +1,4 @@
-package com.github.ysamsonov.rssreader;
+package com.github.ysamsonov.rssreader.junit;
 
 import lombok.Getter;
 import org.junit.jupiter.api.extension.AfterEachCallback;

@@ -1,7 +1,7 @@
 package com.github.ysamsonov.rssreader.config;
 
-import com.github.ysamsonov.rssreader.TempFileExtension;
 import com.github.ysamsonov.rssreader.event.ApplicationEventPublisher;
+import com.github.ysamsonov.rssreader.junit.TempFileExtension;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;

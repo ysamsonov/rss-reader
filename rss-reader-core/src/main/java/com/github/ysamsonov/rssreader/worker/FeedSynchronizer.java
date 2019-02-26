@@ -2,7 +2,10 @@ package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.config.ReaderConfig;
-import com.github.ysamsonov.rssreader.event.*;
+import com.github.ysamsonov.rssreader.event.CreateFeedEvent;
+import com.github.ysamsonov.rssreader.event.DeleteFeedEvent;
+import com.github.ysamsonov.rssreader.event.EditFeedEvent;
+import com.github.ysamsonov.rssreader.event.SwitchStateFeedEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

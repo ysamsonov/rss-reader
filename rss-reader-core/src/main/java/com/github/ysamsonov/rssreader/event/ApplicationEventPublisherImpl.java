@@ -27,10 +27,12 @@ public class ApplicationEventPublisherImpl implements ApplicationEventPublisher 
     public void publish(ApplicationEvent event) {
         var eventType = event.getClass();
         for (var entry : subscribers.entrySet()) {
-            if (eventType.isAssignableFrom(entry.getKey())) {
-                for (var listener : entry.getValue()) {
-                    listener.onEvent(event);
-                }
+            if (!eventType.isAssignableFrom(entry.getKey())) {
+                continue;
+            }
+
+            for (var listener : entry.getValue()) {
+                listener.onEvent(event);
             }
         }
     }
