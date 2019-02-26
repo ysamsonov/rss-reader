@@ -36,6 +36,7 @@ public class ConfigurationManager {
     }
 
     private void load() {
+        log.info("Load configuration");
         if (configFile.exists()) {
             try {
                 this.config = mapper.readValue(configFile, ReaderConfig.class);
@@ -58,6 +59,7 @@ public class ConfigurationManager {
     }
 
     public void addFeed(FeedConfig feed) {
+        log.info("Add feed '{}'", feed.getUrl());
         eventPublisher.publish(new CreateFeedEvent(feed, config));
 
         config.addFeed(feed);
@@ -65,6 +67,8 @@ public class ConfigurationManager {
     }
 
     public void updateFeed(int feedNum, FeedConfig feed) {
+        log.info("Update feed '{}'", feed.getUrl());
+
         // need to update last fetch date before run new task
         feed.setLastFetchDate(config.getFeeds().get(feedNum).getLastFetchDate());
 
@@ -76,6 +80,8 @@ public class ConfigurationManager {
 
     public void deleteFeed(int feedNum) {
         FeedConfig feed = config.getFeeds().get(feedNum);
+
+        log.info("Update feed '{}'", feed.getUrl());
         eventPublisher.publish(new DeleteFeedEvent(feed));
 
         config.deleteFeed(feedNum);
@@ -84,6 +90,8 @@ public class ConfigurationManager {
 
     public void switchStateFeed(int feedNum) {
         FeedConfig feed = config.getFeeds().get(feedNum);
+
+        log.info("Switch state feed '{}'", feed.getUrl());
         eventPublisher.publish(new SwitchStateFeedEvent(feed, !feed.isEnabled(), config));
 
         config.getFeeds().get(feedNum).invertState();
