@@ -24,9 +24,9 @@ public class EditFeedAction extends BaseConsoleAction {
     public void exec() {
         int feedNum = read(
             "Feed number: ",
-            Integer::parseInt,
+            Parsers.feedNumber(),
             Validators.feedNumber(configurationManager)
-        ) - 1;
+        );
 
         FeedConfig originalFeedConfig = configurationManager.getConfig().getFeeds().get(feedNum);
 

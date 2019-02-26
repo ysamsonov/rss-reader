@@ -21,10 +21,10 @@ public class DeleteFeedAction extends BaseConsoleAction {
     public void exec() {
         int feedNum = read(
             "Feed number: ",
-            Integer::parseInt,
+            Parsers.feedNumber(),
             Validators.feedNumber(configurationManager)
         );
 
-        configurationManager.deleteFeed(feedNum - 1);
+        configurationManager.deleteFeed(feedNum);
     }
 }

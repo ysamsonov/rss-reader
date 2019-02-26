@@ -21,10 +21,10 @@ public class SwitchStateFeedAction extends BaseConsoleAction {
     public void exec() {
         int feedNum = read(
             "Feed number: ",
-            Integer::parseInt,
+            Parsers.feedNumber(),
             Validators.feedNumber(configurationManager)
         );
 
-        configurationManager.switchStateFeed(feedNum - 1);
+        configurationManager.switchStateFeed(feedNum);
     }
 }

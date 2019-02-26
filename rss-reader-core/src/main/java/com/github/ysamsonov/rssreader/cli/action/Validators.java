@@ -13,13 +13,15 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
+ * Contains validators for CLI interface
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
 final class Validators {
 
     static Predicate<Integer> feedNumber(ConfigurationManager cm) {
-        return num -> 0 < num && num <= cm.getConfig().getFeeds().size();
+        return num -> 0 <= num && num < cm.getConfig().getFeeds().size();
     }
 
     static Predicate<String> link(ConfigurationManager configurationManager) {
