@@ -41,7 +41,7 @@ public class FileFeedWriter implements FeedWriter {
     public void write(Collection<SyndEntry> entries) {
         if (MiscUtils.isNullOrEmpty(entries)) {
             log.info("Nothing to write for '{}'", feedConfig.getUrl());
-            updateLastFetchDate();
+            updateLastFetchDate(new Date());
             return;
         }
 
@@ -76,7 +76,13 @@ public class FileFeedWriter implements FeedWriter {
             throw new RssReaderException(msg, e);
         }
 
-        updateLastFetchDate();
+        Date lastDate = entries
+            .stream()
+            .map(SyndEntry::getPublishedDate)
+            .max(Date::compareTo)
+            .orElseThrow();
+
+        updateLastFetchDate(lastDate);
     }
 
     private void writeEntry(PrintWriter writer, SyndEntry entry) {
@@ -90,15 +96,15 @@ public class FileFeedWriter implements FeedWriter {
 
             String value = extractor.getValue().apply(entry);
             if (!MiscUtils.isNullOrEmpty(value)) {
-                writer.write(value);
+                writer.write(value.replace('\n', ' '));
             }
             writer.write("\n");
         }
         writer.write("\n");
     }
 
-    private void updateLastFetchDate() {
+    private void updateLastFetchDate(Date lastFetchDate) {
         log.info("Update last fetch date for '{}'", feedConfig.getUrl());
-        feedConfig.setLastFetchDate(new Date());
+        feedConfig.setLastFetchDate(lastFetchDate);
     }
 }

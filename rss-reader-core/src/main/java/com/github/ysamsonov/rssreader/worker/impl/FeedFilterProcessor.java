@@ -7,8 +7,9 @@ import com.rometools.rome.feed.synd.SyndFeed;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Filter items by {@link SyndFeed#getPublishedDate()}
@@ -30,32 +31,14 @@ public class FeedFilterProcessor implements FeedProcessor<SyndFeed, Collection<S
             return Collections.emptyList();
         }
 
-        // TODO: filter by count and published date!
-        Optional<Date> publishedDate = findPublishedDate(feed);
-        if (publishedDate.isEmpty()) {
-            return feed.getEntries();
-        }
-
         var lastFetchDate = feedConfig.getLastFetchDate();
-        if (lastFetchDate == null || publishedDate.get().compareTo(lastFetchDate) >= 0) {
-            return feed.getEntries();
-        }
-
-        return Collections.emptyList();
-    }
-
-    private Optional<Date> findPublishedDate(SyndFeed feed) {
-        var publishedDate = feed.getPublishedDate();
-        if (publishedDate != null) {
-            return Optional.of(publishedDate);
-        }
-
-        for (var entry : feed.getEntries()) {
-            if (entry.getPublishedDate() != null) {
-                return Optional.of(entry.getPublishedDate());
-            }
-        }
-
-        return Optional.empty();
+        return feed.getEntries()
+            .stream()
+            .filter(e -> Objects.nonNull(e.getPublishedDate()))
+            .filter(e -> e.getPublishedDate().compareTo(lastFetchDate) > 0)
+            .sorted(Comparator.comparing(SyndEntry::getPublishedDate))
+            .limit(feedConfig.getFetchCount())
+            .collect(Collectors.toList())
+            ;
     }
 }

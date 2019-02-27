@@ -101,4 +101,13 @@ final class Validators {
             }
         };
     }
+
+    /**
+     * Always return true fo value validation
+     *
+     * @return true
+     */
+    static <T> Predicate<T> anyValue() {
+        return v -> true;
+    }
 }
