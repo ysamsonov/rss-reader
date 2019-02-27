@@ -4,7 +4,10 @@ import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Scanner;
 import java.util.function.Function;
 
 /**

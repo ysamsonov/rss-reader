@@ -121,7 +121,7 @@ public class ConfigurationManager {
         FeedConfig feed = config.getFeeds().get(feedNum);
 
         log.info("Update feed '{}'", feed.getUrl());
-        eventPublisher.publish(new DeleteFeedEvent(feed));
+        eventPublisher.publish(new DeleteFeedEvent(feed, config));
 
         config.deleteFeed(feedNum);
         persist();
@@ -143,7 +143,7 @@ public class ConfigurationManager {
     }
 
     public void onUpdateLastFetchTime(UpdateLastFetchTimeEvent event) {
-        log.info("Handle update");
+        log.info("Handle update last fetch time for feed {}", event.getFeedConfig().getUrl());
         persist();
     }
 
@@ -164,7 +164,6 @@ public class ConfigurationManager {
         persist();
     }
 
-    // TODO: надо переодически сбрасывать в файлы
     private void persist() {
         synchronized (monitor) {
             try {
