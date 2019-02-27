@@ -1,6 +1,6 @@
 package com.github.ysamsonov.rssreader;
 
-import com.github.ysamsonov.rssreader.cli.CliInterface;
+import com.github.ysamsonov.rssreader.cli.CommandLineInterface;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.helpers.PropertyResolver;
@@ -29,7 +29,7 @@ public class Application {
 
     private final FeedSynchronizer feedSynchronizer;
 
-    private final CliInterface cliInterface;
+    private final CommandLineInterface commandLineInterface;
 
     private final ApplicationEventPublisherImpl eventPublisher;
 
@@ -41,7 +41,7 @@ public class Application {
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile(), eventPublisher);
         this.feedSynchronizer = new FeedSynchronizer(getSyncPoolSize(), new BaseFeedSyncTaskFactory(eventPublisher));
-        this.cliInterface = new CliInterface(configurationManager, this::exit);
+        this.commandLineInterface = new CommandLineInterface(configurationManager, this::exit);
     }
 
     /**
@@ -81,7 +81,7 @@ public class Application {
      * Run application: show interface, etc.
      */
     private void run() {
-        cliInterface.show();
+        commandLineInterface.show();
     }
 
     /**
