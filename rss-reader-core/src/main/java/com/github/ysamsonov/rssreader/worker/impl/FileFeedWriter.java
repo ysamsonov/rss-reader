@@ -6,12 +6,12 @@ import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import com.github.ysamsonov.rssreader.worker.FeedWriter;
 import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -38,8 +38,8 @@ public class FileFeedWriter implements FeedWriter {
     }
 
     @Override
-    public void write(SyndFeed syndFeed) {
-        if (syndFeed == null) {
+    public void write(Collection<SyndEntry> entries) {
+        if (MiscUtils.isNullOrEmpty(entries)) {
             log.info("Nothing to write for '{}'", feedConfig.getUrl());
             updateLastFetchDate();
             return;
@@ -47,21 +47,21 @@ public class FileFeedWriter implements FeedWriter {
 
         try {
             lock.lock();
-            writeFeed(syndFeed);
+            writeFeed(entries);
         }
         finally {
             lock.unlock();
         }
     }
 
-    private void writeFeed(SyndFeed syndFeed) {
+    private void writeFeed(Collection<SyndEntry> entries) {
         log.info("Write data from feed '{}' to file '{}'", feedConfig.getUrl(), feedConfig.getFileName());
         try (
             FileWriter fileWriter = new FileWriter(feedConfig.getFileName(), true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             PrintWriter writer = new PrintWriter(bufferedWriter)
         ) {
-            for (SyndEntry entry : syndFeed.getEntries()) {
+            for (SyndEntry entry : entries) {
                 writeEntry(writer, entry);
             }
         }

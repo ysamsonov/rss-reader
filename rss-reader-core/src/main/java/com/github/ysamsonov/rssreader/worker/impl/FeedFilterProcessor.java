@@ -2,8 +2,11 @@ package com.github.ysamsonov.rssreader.worker.impl;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.worker.FeedProcessor;
+import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
@@ -13,7 +16,7 @@ import java.util.Optional;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
-public class FeedFilterProcessor implements FeedProcessor<SyndFeed, SyndFeed> {
+public class FeedFilterProcessor implements FeedProcessor<SyndFeed, Collection<SyndEntry>> {
 
     private final FeedConfig feedConfig;
 
@@ -22,22 +25,23 @@ public class FeedFilterProcessor implements FeedProcessor<SyndFeed, SyndFeed> {
     }
 
     @Override
-    public SyndFeed process(SyndFeed feed) {
+    public Collection<SyndEntry> process(SyndFeed feed) {
         if (feed == null) {
-            return null;
+            return Collections.emptyList();
         }
 
+        // TODO: filter by count and published date!
         Optional<Date> publishedDate = findPublishedDate(feed);
         if (publishedDate.isEmpty()) {
-            return feed;
+            return feed.getEntries();
         }
 
         var lastFetchDate = feedConfig.getLastFetchDate();
         if (lastFetchDate == null || publishedDate.get().compareTo(lastFetchDate) >= 0) {
-            return feed;
+            return feed.getEntries();
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     private Optional<Date> findPublishedDate(SyndFeed feed) {
