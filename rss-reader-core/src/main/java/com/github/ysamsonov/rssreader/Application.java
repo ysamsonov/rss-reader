@@ -62,6 +62,7 @@ public class Application {
         eventPublisher.subscribe(EditFeedEvent.class, feedSynchronizer::onEditFeed);
         eventPublisher.subscribe(DeleteFeedEvent.class, feedSynchronizer::onDeleteFeed);
         eventPublisher.subscribe(SwitchStateFeedEvent.class, feedSynchronizer::onSwitchStateFeed);
+        eventPublisher.subscribe(UpdateLastFetchTimeEvent.class, configurationManager::onUpdateLastFetchTime);
 
         feedSynchronizer.onStart(configurationManager.getConfig());
 

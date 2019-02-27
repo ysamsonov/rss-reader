@@ -1,6 +1,8 @@
 package com.github.ysamsonov.rssreader.worker.impl;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.github.ysamsonov.rssreader.event.ApplicationEventPublisher;
+import com.github.ysamsonov.rssreader.event.UpdateLastFetchTimeEvent;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 import com.github.ysamsonov.rssreader.utils.MiscUtils;
@@ -31,10 +33,13 @@ public class FileFeedWriter implements FeedWriter {
 
     private final ReentrantLock lock;
 
-    public FileFeedWriter(FeedConfig feedConfig, ReentrantLock lock) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public FileFeedWriter(FeedConfig feedConfig, ReentrantLock lock, ApplicationEventPublisher eventPublisher) {
         this.feedConfig = feedConfig;
         this.propWritePredicate = feedConfig.fieldPredicate();
         this.lock = lock;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -106,5 +111,6 @@ public class FileFeedWriter implements FeedWriter {
     private void updateLastFetchDate(Date lastFetchDate) {
         log.info("Update last fetch date for '{}'", feedConfig.getUrl());
         feedConfig.setLastFetchDate(lastFetchDate);
+        eventPublisher.publish(new UpdateLastFetchTimeEvent(feedConfig, lastFetchDate));
     }
 }
