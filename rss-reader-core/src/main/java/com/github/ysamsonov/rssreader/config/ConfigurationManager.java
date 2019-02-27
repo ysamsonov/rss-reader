@@ -4,26 +4,44 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.mapper.ObjectMapperFactory;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
+ * Manages application settings and provides CRUD methods for them
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
 @Slf4j
 public class ConfigurationManager {
 
+    /**
+     * Lock  for write operations
+     */
     private final Object monitor = new Object();
 
+    /**
+     * File with application configuration
+     */
     private final File configFile;
 
+    /**
+     * Publishes events occurring with configuration
+     */
     private final ApplicationEventPublisher eventPublisher;
 
+    /**
+     * Configuration deserializer
+     */
     private final ObjectMapper mapper;
 
+    /**
+     * Cache of application config
+     */
     private ReaderConfig config;
 
     public ConfigurationManager(File configFile, ApplicationEventPublisher eventPublisher) {
@@ -35,6 +53,9 @@ public class ConfigurationManager {
         load();
     }
 
+    /**
+     * Load configuration on application startup
+     */
     private void load() {
         log.info("Load configuration");
         if (configFile.exists()) {
@@ -58,7 +79,12 @@ public class ConfigurationManager {
         }
     }
 
-    public void addFeed(FeedConfig feed) {
+    /**
+     * Add new feed to configuration
+     *
+     * @param feed - new feed
+     */
+    public void addFeed(@NonNull FeedConfig feed) {
         log.info("Add feed '{}'", feed.getUrl());
         eventPublisher.publish(new CreateFeedEvent(feed, config));
 
@@ -66,6 +92,12 @@ public class ConfigurationManager {
         persist();
     }
 
+    /**
+     * Update feed by given identifier
+     *
+     * @param feedNum - identifier of feed
+     * @param feed    - updated instance
+     */
     public void updateFeed(int feedNum, FeedConfig feed) {
         log.info("Update feed '{}'", feed.getUrl());
 
@@ -78,6 +110,11 @@ public class ConfigurationManager {
         persist();
     }
 
+    /**
+     * Delete feed by given identifier
+     *
+     * @param feedNum - identifier of feed
+     */
     public void deleteFeed(int feedNum) {
         FeedConfig feed = config.getFeeds().get(feedNum);
 
@@ -88,6 +125,11 @@ public class ConfigurationManager {
         persist();
     }
 
+    /**
+     * Switch state of feed by given identifier
+     *
+     * @param feedNum - identifier of feed
+     */
     public void switchStateFeed(int feedNum) {
         FeedConfig feed = config.getFeeds().get(feedNum);
 
@@ -98,10 +140,18 @@ public class ConfigurationManager {
         persist();
     }
 
+    /**
+     * Get config from cache
+     *
+     * @return configuration
+     */
     public ReaderConfig getConfig() {
         return config;
     }
 
+    /**
+     * Perform operations on shutdown: persist configuration to file storage, etc.
+     */
     public void onShutdown() {
         log.info("Persist configuration on shutdown");
         persist();

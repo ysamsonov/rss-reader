@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
+ * Command Line Interface of application
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
@@ -19,6 +21,9 @@ public class CliInterface {
 
     private final ConfigurationManager configurationManager;
 
+    /**
+     * Main menu of application ie zero-level
+     */
     private final Menu mainMenu;
 
     public CliInterface(
@@ -42,11 +47,17 @@ public class CliInterface {
         );
     }
 
+    /**
+     * Show application interface to user
+     */
     public void show() {
         new BannerWriter().write();
         printMainMenu();
     }
 
+    /**
+     * Show main menu after  finish of any command
+     */
     @SuppressWarnings("InfiniteLoopStatement")
     private void printMainMenu() {
         while (true) {
@@ -54,6 +65,9 @@ public class CliInterface {
         }
     }
 
+    /**
+     * Action for prints feed list to console
+     */
     private void feedList() {
         List<FeedConfig> feeds = configurationManager.getConfig().getFeeds();
         if (feeds.isEmpty()) {

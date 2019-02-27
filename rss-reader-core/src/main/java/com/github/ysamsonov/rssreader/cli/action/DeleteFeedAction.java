@@ -5,6 +5,8 @@ import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import java.util.Scanner;
 
 /**
+ * Handle deleting feed by it's identifier
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */

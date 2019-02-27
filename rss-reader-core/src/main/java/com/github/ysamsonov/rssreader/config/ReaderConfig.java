@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Configuration whole application
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
@@ -14,10 +16,19 @@ import java.util.List;
 @Setter
 public class ReaderConfig {
 
+    /**
+     * All feeds for monitoring
+     */
     private List<FeedConfig> feeds = new ArrayList<>();
 
+    /**
+     * Default count of items for pooling
+     */
     private int fetchCount = 10;
 
+    /**
+     * Default pooling time interval
+     */
     private String fetchTime = "10m";
 
     public ReaderConfig addFeed(FeedConfig feed) {
@@ -25,6 +36,7 @@ public class ReaderConfig {
         return this;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void deleteFeed(int feedNum) {
         this.feeds.remove(feedNum);
     }

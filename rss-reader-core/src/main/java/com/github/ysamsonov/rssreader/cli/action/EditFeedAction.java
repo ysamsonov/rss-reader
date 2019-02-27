@@ -8,6 +8,14 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
+ * Handle editing of feed by it's identifier.
+ * During edit user can modify:
+ * 1. {@link FeedConfig#getFileName()} to write
+ * 2. {@link FeedConfig#isEnabled()} flag
+ * 3. {@link FeedConfig#getFields()} filter
+ * 4. {@link FeedConfig#getFetchTime()}
+ * 5. {@link FeedConfig#getFetchCount()}
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */

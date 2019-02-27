@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
+ * Component represent menu for cli
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
@@ -20,6 +22,9 @@ public class Menu {
 
     private final List<Command> commands;
 
+    /**
+     * Print menu to console and handle users action
+     */
     public void show() {
         showMenu();
         try {
@@ -33,6 +38,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Print menu
+     */
     private void showMenu() {
         System.out.println(title);
         for (int i = 0; i < commands.size(); i++) {
@@ -41,6 +49,9 @@ public class Menu {
         System.out.println("Please enter command and press Enter: ");
     }
 
+    /**
+     * Handle user action with small validation
+     */
     private void awaitAction() {
         while (true) {
             String line = scanner.nextLine().trim();

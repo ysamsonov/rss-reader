@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
+ * Read data from given {@link URL} using {@link SyndFeedInput} for parsing data
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */

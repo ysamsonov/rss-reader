@@ -9,6 +9,8 @@ import lombok.NonNull;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Parse {@link com.github.ysamsonov.rssreader.config.FeedConfig#getFetchTime()} to delay and time unit
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */

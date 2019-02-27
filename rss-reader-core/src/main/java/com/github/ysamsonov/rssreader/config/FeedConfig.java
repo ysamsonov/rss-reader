@@ -14,6 +14,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
+ * Concrete RSS or Atom feed configuration
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
@@ -22,16 +24,39 @@ import java.util.function.Predicate;
 @Accessors(chain = true)
 public class FeedConfig {
 
+    /**
+     * Url to download information
+     */
     private String url;
 
+    /**
+     * Synchronization activity flag
+     */
     private boolean enabled = true;
 
+    /**
+     * Target file name
+     */
     private String fileName;
 
+    /**
+     * List of fields for translation, empty array for translation of all fields
+     */
     private Collection<String> fields = new ArrayList<>();
 
+    /**
+     * Feed pooling interval
+     */
     private String fetchTime;
 
+    /**
+     * Count of items for pooling
+     */
+    private int fetchCount = 10;
+
+    /**
+     * Date of last pooling
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormats.DATE__TIME__TZ_ISO_8601)
     private Date lastFetchDate;
 
@@ -43,6 +68,11 @@ public class FeedConfig {
         this.enabled = !this.enabled;
     }
 
+    /**
+     * Construct predicate to check field on write step
+     *
+     * @return predicate
+     */
     public Predicate<String> fieldPredicate() {
         if (MiscUtils.isNullOrEmpty(getFields())) {
             return $ -> true;

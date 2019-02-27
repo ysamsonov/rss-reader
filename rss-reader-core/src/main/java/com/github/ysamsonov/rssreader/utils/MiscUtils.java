@@ -5,6 +5,8 @@ import lombok.experimental.UtilityClass;
 import java.util.Collection;
 
 /**
+ * A Set of miscellaneous utilities
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */

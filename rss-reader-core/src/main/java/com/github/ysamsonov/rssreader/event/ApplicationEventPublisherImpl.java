@@ -6,20 +6,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Simple implementation of {@link ApplicationEventPublisher}
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
 public class ApplicationEventPublisherImpl implements ApplicationEventPublisher {
 
+    /**
+     * Subscribers grouped by {@link ApplicationEventPublisher.ApplicationEvent}
+     */
     private final Map<Class, Collection<ApplicationEventListener>> subscribers = new HashMap<>();
 
+    /**
+     * Associate event type with listener and write this association to {@link this#subscribers}
+     *
+     * @param eventType     - event type for subscription
+     * @param eventListener - concrete listener
+     */
     public <T extends ApplicationEvent> void subscribe(
         Class<T> eventType,
-        ApplicationEventListener<T> applicationEventListener
+        ApplicationEventListener<T> eventListener
     ) {
         subscribers
             .computeIfAbsent(eventType, k -> new ArrayList<>())
-            .add(applicationEventListener);
+            .add(eventListener);
     }
 
     @Override

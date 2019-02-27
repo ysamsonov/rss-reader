@@ -13,21 +13,36 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Contains validators for CLI interface
+ * A set of validators for CLI interface
  *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
 final class Validators {
 
+    /**
+     * Feed number validator by feed id
+     *
+     * @param cm - configuration manager to get access to app config
+     * @return validator predicate
+     */
     static Predicate<Integer> feedNumber(ConfigurationManager cm) {
         return num -> 0 <= num && num < cm.getConfig().getFeeds().size();
     }
 
-    static Predicate<String> link(ConfigurationManager configurationManager) {
+    /**
+     * Validate feed link.
+     * 1. check uniqueness for a given link
+     * 2. try ping feed link
+     * 3. TODO: validate items and pubDate
+     *
+     * @param cm - configuration manager to get access to feed config
+     * @return validator predicate
+     */
+    static Predicate<String> link(ConfigurationManager cm) {
         return link -> {
             try {
-                boolean hasFeed = configurationManager
+                boolean hasFeed = cm
                     .getConfig()
                     .getFeeds()
                     .stream()
@@ -54,6 +69,11 @@ final class Validators {
         };
     }
 
+    /**
+     * Validate feed fields filter.
+     *
+     * @return validator predicate
+     */
     static Predicate<Collection<String>> fields() {
         return fields -> {
             if (fields.isEmpty()) {
@@ -64,6 +84,11 @@ final class Validators {
         };
     }
 
+    /**
+     * Validate feed fetch time format
+     *
+     * @return validator predicate
+     */
     static Predicate<String> fetchTime() {
         return fTime -> {
             try {

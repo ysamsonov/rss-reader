@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.Optional;
 
 /**
+ * Filter items by {@link SyndFeed#getPublishedDate()}
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */

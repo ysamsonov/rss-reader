@@ -11,6 +11,8 @@ import lombok.Getter;
 import java.io.File;
 
 /**
+ * Entry point for application
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-22
  */
@@ -29,14 +31,20 @@ public class Application {
 
     private final ApplicationEventPublisherImpl eventPublisher;
 
+    /**
+     * Constructor instantiate application context
+     */
     private Application() {
         this.eventPublisher = new ApplicationEventPublisherImpl();
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile(), eventPublisher);
-        this.feedSynchronizer = new FeedSynchronizer(getThreadCount(), new BaseFeedSyncTaskFactory());
+        this.feedSynchronizer = new FeedSynchronizer(getSyncPoolSize(), new BaseFeedSyncTaskFactory());
         this.cliInterface = new CliInterface(configurationManager, this::exit);
     }
 
+    /**
+     * Entry point
+     */
     public static void main(String[] args) {
         appInstance = new Application();
         appInstance
@@ -44,6 +52,9 @@ public class Application {
             .run();
     }
 
+    /**
+     * Initialize of application context
+     */
     private Application init() {
         eventPublisher.subscribe(CreateFeedEvent.class, feedSynchronizer::onCreateFeed);
         eventPublisher.subscribe(EditFeedEvent.class, feedSynchronizer::onEditFeed);
@@ -54,10 +65,16 @@ public class Application {
         return this;
     }
 
+    /**
+     * Run application: show interface, etc.
+     */
     private void run() {
         cliInterface.show();
     }
 
+    /**
+     * Correctly shutdown application
+     */
     private void exit() {
         System.out.println("Start shutdown");
 
@@ -68,12 +85,22 @@ public class Application {
         System.exit(0);
     }
 
+    /**
+     * Find file of configuration location {@link ConfigurationManager}
+     *
+     * @return user given file or default
+     */
     private File getReaderConfigFile() {
         String fileName = propertyResolver.getProperty("rssreader.config.location").orElse("reader-config.json");
         return new File(fileName);
     }
 
-    private int getThreadCount() {
+    /**
+     * Load pool size for {@link FeedSynchronizer}
+     *
+     * @return user given pool size or default
+     */
+    private int getSyncPoolSize() {
         return propertyResolver.getProperty("rssreader.feed.synchronizer.pool.size", Integer.class).orElse(4);
     }
 }

@@ -8,6 +8,8 @@ import com.github.ysamsonov.rssreader.worker.impl.UrlFeedReader;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Default implementation of {@link FeedSyncTaskFactory} that read data from internet, filter by pubDate, and write to file
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */

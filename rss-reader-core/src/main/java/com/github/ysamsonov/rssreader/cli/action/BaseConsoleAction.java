@@ -8,6 +8,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
+ * Abstract class contains common methods for console actions.
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
@@ -16,6 +18,9 @@ abstract class BaseConsoleAction implements Command.Action {
 
     final Scanner scanner;
 
+    /**
+     * @see this#read(String, Function, Predicate, Object)
+     */
     <T> T read(
         String msg,
         Function<String, T> converter,
@@ -24,6 +29,15 @@ abstract class BaseConsoleAction implements Command.Action {
         return read(msg, converter, validator, null);
     }
 
+    /**
+     * Reads with verification and try again if necessary.
+     *
+     * @param msg           - message to show user before action
+     * @param converter     - convert given string from console to type
+     * @param validator     - validates inputed data
+     * @param fallbackValue - fall back value, returns if input is empty and if fallbackValue is not null
+     * @return converter and validate value
+     */
     <T> T read(
         String msg,
         Function<String, T> converter,

@@ -10,6 +10,8 @@ import java.util.Scanner;
 import java.util.function.Function;
 
 /**
+ * Handle creating of new feed
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */

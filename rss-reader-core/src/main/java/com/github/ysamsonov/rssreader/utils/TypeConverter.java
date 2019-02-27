@@ -10,6 +10,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
+ * A set of type converters
+ *
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
@@ -25,6 +27,13 @@ public final class TypeConverter {
         new Converter<>(equalTo(String.class), equalTo(Float.class), Float::parseFloat)
     );
 
+    /**
+     * Convert data to the given type
+     *
+     * @param targetType - type of valueo to convert
+     * @param value      - value to convert
+     * @return - converted value
+     */
     public static <T> T convert(Class<T> targetType, Object value) {
         if (targetType == null) {
             throw new TypeConvertException("Unknown target type for value '%s'", value);
