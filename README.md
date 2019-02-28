@@ -1,4 +1,6 @@
 # RSS Reader
+![Travis build](https://travis-ci.com/ysamsonov/rss-reader.svg?token=eeiUqii3zoxH4p569Lqh&branch=develop)
+
 
 # Usage
 First of all, clone this repo and go to the project directory.  
