@@ -1,13 +1,10 @@
 package com.github.ysamsonov.rssreader.worker.impl;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
-import com.rometools.rome.feed.synd.SyndContentImpl;
-import com.rometools.rome.feed.synd.SyndEntryImpl;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.feed.synd.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,80 +19,72 @@ class FeedFilterProcessorTest {
     void nullInputTest() {
         var processor = new FeedFilterProcessor(feedConfig());
 
-        assertThat(processor.process(null)).isNull();
+        assertThat(processor.process(null)).isEmpty();
     }
 
+    // skip all items if published date is empty. published date should be always not null
     @Test
     void emptyPublishedDate() {
         var processor = new FeedFilterProcessor(feedConfig());
 
-        var feed = syndFeed();
+        var feed = feed();
+        feed.setEntries(
+            Arrays.asList(
+                entry(),
+                entry(),
+                entry()
+            )
+        );
         var processed = processor.process(feed);
-        assertThat(processed == feed).isTrue();
+        assertThat(processed).isEmpty();
     }
 
     @Test
-    void filterByPublishedDateWithoutPrevFetch() {
-        var processor = new FeedFilterProcessor(feedConfig());
-
-        var feed = syndFeed();
-        feed.setPublishedDate(new Date(System.currentTimeMillis() - 10_000));
-
-        var processed = processor.process(feed);
-        assertThat(processed == feed).isTrue();
-    }
-
-    @Test
-    void filterByPublishedDateFromEntryWithoutPrevFetch() {
-        var processor = new FeedFilterProcessor(feedConfig());
-
-        var feed = syndFeed();
-        feed.getEntries().get(0).setPublishedDate(new Date(System.currentTimeMillis() - 10_000));
-
-        var processed = processor.process(feed);
-        assertThat(processed == feed).isTrue();
-    }
-
-    @Test
-    void filterByPublishedDateWithPrevFetch() {
-        var feedConfig = feedConfig().setLastFetchDate(new Date());
+    void filterByPublishedDate() {
+        var feedConfig = feedConfig().setLastFetchDate(new Date(System.currentTimeMillis() - 50_000));
         var processor = new FeedFilterProcessor(feedConfig);
 
-        var feed = syndFeed();
-        feed.setPublishedDate(new Date(System.currentTimeMillis() - 10_000));
+        var feed = feed();
+        feed.setEntries(
+            Arrays.asList(
+                entry("en1", new Date(System.currentTimeMillis() - 20_000)),
+                entry("en2", new Date(System.currentTimeMillis() - 10_000)),
+                entry("en4", new Date(System.currentTimeMillis() - 70_000)),
+                entry("en3", new Date(System.currentTimeMillis() - 30_000))
+            )
+        );
 
         var processed = processor.process(feed);
-        assertThat(processed).isNull();
-    }
-
-    @Test
-    void filterByPublishedDateFromEntryWithPrevFetch() {
-        var feedConfig = feedConfig().setLastFetchDate(new Date());
-        var processor = new FeedFilterProcessor(feedConfig);
-
-        var feed = syndFeed();
-        feed.getEntries().get(0).setPublishedDate(new Date(System.currentTimeMillis() - 10_000));
-
-        var processed = processor.process(feed);
-        assertThat(processed).isNull();
+        assertThat(processed)
+            .extracting(SyndEntry::getTitle)
+            .containsExactly("en3", "en1", "en2");
     }
 
     private FeedConfig feedConfig() {
         return new FeedConfig()
-            .setUrl("http://fake.com/rss.xml");
+            .setUrl("http://fake.com/rss.xml")
+            .setLastFetchDate(new Date());
     }
 
-    private SyndFeed syndFeed() {
-        SyndFeedImpl syndFeed = new SyndFeedImpl();
+    private SyndFeed feed() {
+        return new SyndFeedImpl();
+    }
 
+    private SyndEntry entry() {
+        return entry(null, null);
+    }
+
+    private SyndEntry entry(String title, Date publishedDate) {
         SyndEntryImpl entry = new SyndEntryImpl();
-        entry.setTitle("Super Title");
+        entry.setTitle(title != null ? title : "Super Title");
         SyndContentImpl description = new SyndContentImpl();
         description.setValue("Super Description");
         entry.setDescription(description);
         entry.setAuthor("Yurez");
-
-        syndFeed.setEntries(Collections.singletonList(entry));
-        return syndFeed;
+        entry.setPublishedDate(publishedDate);
+        if (publishedDate != null) {
+            entry.setPublishedDate(publishedDate);
+        }
+        return entry;
     }
 }
