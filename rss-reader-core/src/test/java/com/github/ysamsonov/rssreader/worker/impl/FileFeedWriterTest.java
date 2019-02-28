@@ -1,6 +1,7 @@
 package com.github.ysamsonov.rssreader.worker.impl;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.github.ysamsonov.rssreader.event.ApplicationEventPublisher;
 import com.github.ysamsonov.rssreader.junit.TempFileExtension;
 import com.rometools.rome.feed.synd.SyndContentImpl;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
@@ -8,11 +9,13 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,11 +29,14 @@ class FileFeedWriterTest {
     @RegisterExtension
     final TempFileExtension tempFileExtension = new TempFileExtension();
 
+    private final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+
     @Test
     void writeNull() throws IOException {
         FileFeedWriter writer = new FileFeedWriter(
             feedConfig(),
-            new ReentrantLock()
+            new ReentrantLock(),
+            eventPublisher
         );
 
         writer.write(null);
@@ -43,11 +49,12 @@ class FileFeedWriterTest {
     void writeAllFields() throws IOException {
         FileFeedWriter writer = new FileFeedWriter(
             feedConfig(),
-            new ReentrantLock()
+            new ReentrantLock(),
+            eventPublisher
         );
 
         SyndFeed syndFeed = syndFeed();
-        writer.write(syndFeed);
+        writer.write(syndFeed.getEntries());
 
         String content = Files.readString(tempFileExtension.getTmpFile().toPath());
         assertThat(content)
@@ -60,11 +67,12 @@ class FileFeedWriterTest {
     void writeWithFilters() throws IOException {
         FileFeedWriter writer = new FileFeedWriter(
             feedConfigWithFilters(),
-            new ReentrantLock()
+            new ReentrantLock(),
+            eventPublisher
         );
 
         SyndFeed syndFeed = syndFeed();
-        writer.write(syndFeed);
+        writer.write(syndFeed.getEntries());
 
         String content = Files.readString(tempFileExtension.getTmpFile().toPath());
         assertThat(content)
@@ -93,6 +101,7 @@ class FileFeedWriterTest {
         description.setValue("Super Description");
         entry.setDescription(description);
         entry.setAuthor("Yurez");
+        entry.setPublishedDate(new Date());
 
         syndFeed.setEntries(Collections.singletonList(entry));
         return syndFeed;

@@ -2,6 +2,7 @@ package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.config.ReaderConfig;
+import com.github.ysamsonov.rssreader.event.ApplicationEventPublisher;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.junit.TempFileExtension;
 import com.github.ysamsonov.rssreader.worker.impl.FeedFilterProcessor;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,6 +39,8 @@ class FeedSynchronizerTest {
     @RegisterExtension
     final TempFileExtension resFile2 = new TempFileExtension();
 
+    private final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+
     private FeedSynchronizer feedSynchronizer;
 
     @BeforeEach
@@ -47,7 +51,7 @@ class FeedSynchronizerTest {
                 fc,
                 new MockReader(fc),
                 new FeedFilterProcessor(fc),
-                new FileFeedWriter(fc, wl)
+                new FileFeedWriter(fc, wl, eventPublisher)
             )
         );
     }

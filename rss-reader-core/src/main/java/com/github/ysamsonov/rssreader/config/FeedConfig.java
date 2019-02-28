@@ -58,7 +58,7 @@ public class FeedConfig {
      * Date of last pooling
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormats.DATE__TIME__TZ_ISO_8601)
-    private Date lastFetchDate;
+    private Date lastFetchDate = new Date();
 
     public FeedConfig() {
     }
