@@ -119,6 +119,11 @@ class FeedSynchronizerTest {
     }
 
     private void assertRssResult(String content) {
+        // check correct order of items
+        assertThat(content)
+            .containsSubsequence("title: Роджерс назначен главным тренером", "title: «Спартак» обыграл СКА");
+
+        // check contains required text
         assertThat(content)
             .contains("title: Роджерс назначен главным тренером")
             .contains("description: «Лестер» объявил о назначении")
@@ -129,6 +134,11 @@ class FeedSynchronizerTest {
     }
 
     private void assertAtomResult(String content) {
+        // check correct order of items
+        assertThat(content)
+            .containsSubsequence("title: Our Cat Thinks A Dog", "title: Ziggy The Hunter");
+
+        // check contains required text
         assertThat(content)
             .contains("title: Our Cat Thinks A Dog")
             .contains("contents: Ziggy really is quite the cat")
