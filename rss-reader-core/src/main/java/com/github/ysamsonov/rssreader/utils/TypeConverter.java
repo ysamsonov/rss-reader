@@ -39,6 +39,7 @@ public final class TypeConverter {
      * @param value      - value to convert
      * @return - converted value
      */
+    @SuppressWarnings("unchecked")
     public static <T> T convert(Class<T> targetType, Object value) {
         if (targetType == null) {
             throw new TypeConvertException("Unknown target type for value '%s'", value);
@@ -49,7 +50,6 @@ public final class TypeConverter {
         }
 
         if (targetType.isInstance(value)) {
-            //noinspection unchecked
             return (T) value;
         }
 
@@ -57,7 +57,6 @@ public final class TypeConverter {
 
         for (Converter converter : converters) {
             if (converter.matches(sourceType, targetType)) {
-                //noinspection unchecked
                 return (T) converter.convert(value);
             }
         }

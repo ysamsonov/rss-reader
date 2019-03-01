@@ -86,7 +86,9 @@ public class FeedSynchronizer {
     public void onEditFeed(EditFeedEvent event) {
         synchronized (monitor) {
             deleteFeed(event.getFeedConfig(), event.getFileNames());
-            addFeed(event.getReaderConfig(), event.getFeedConfig());
+            if (event.getFeedConfig().isEnabled()) {
+                addFeed(event.getReaderConfig(), event.getFeedConfig());
+            }
         }
     }
 

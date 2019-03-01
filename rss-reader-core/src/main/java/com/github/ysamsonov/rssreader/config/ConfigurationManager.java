@@ -135,8 +135,9 @@ public class ConfigurationManager {
     public void switchStateFeed(int feedNum) {
         FeedConfig feed = config.getFeeds().get(feedNum);
 
-        log.info("Switch state feed '{}'", feed.getUrl());
-        eventPublisher.publish(new SwitchStateFeedEvent(feed, !feed.isEnabled(), config));
+        boolean updatedState = !feed.isEnabled();
+        log.info("Switch state feed '{}' to", feed.getUrl(), updatedState);
+        eventPublisher.publish(new SwitchStateFeedEvent(feed, updatedState, config));
 
         config.getFeeds().get(feedNum).invertState();
         persist();

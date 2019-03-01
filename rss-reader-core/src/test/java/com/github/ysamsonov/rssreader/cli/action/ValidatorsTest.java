@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ValidatorsTest {
 
+    @SuppressWarnings("unchecked")
     @Test
     void feedNumber() {
         var cm = Mockito.mock(ConfigurationManager.class);
@@ -25,7 +26,6 @@ class ValidatorsTest {
         var feeds = Mockito.mock(List.class);
 
         Mockito.when(cm.getConfig()).thenReturn(rconf);
-        //noinspection unchecked
         Mockito.when(rconf.getFeeds()).thenReturn(feeds);
         Mockito.when(feeds.size()).thenReturn(10);
 

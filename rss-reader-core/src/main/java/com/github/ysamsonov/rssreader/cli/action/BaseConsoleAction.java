@@ -17,6 +17,8 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 abstract class BaseConsoleAction implements Command.Action {
 
+    private static final String EXIT_CMD = "$exit";
+
     final Scanner scanner;
 
     /**
@@ -54,7 +56,7 @@ abstract class BaseConsoleAction implements Command.Action {
                 return fallbackValue;
             }
 
-            if (line.equalsIgnoreCase("exit")) {
+            if (line.equalsIgnoreCase(EXIT_CMD)) {
                 throw new InterruptCliActionException();
             }
 
@@ -69,7 +71,10 @@ abstract class BaseConsoleAction implements Command.Action {
             if (validator.test(val)) {
                 return val;
             }
-            System.out.println("Incorrect format of value. Please repeat. Or interrupt the operation by typing 'exit'");
+            System.out.println(String.format(
+                "Incorrect format of value. Please repeat. Or interrupt the operation by typing '%s'",
+                EXIT_CMD
+            ));
         }
     }
 }
