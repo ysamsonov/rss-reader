@@ -60,13 +60,7 @@ public class FileFeedWriter implements FeedWriter {
             return;
         }
 
-        try {
-            lock.lock();
-            writeFeed(entries);
-        }
-        finally {
-            lock.unlock();
-        }
+        writeFeed(entries);
     }
 
     private void writeFeed(Collection<SyndEntry> entries) {
@@ -81,7 +75,14 @@ public class FileFeedWriter implements FeedWriter {
         for (int i = 0, partitionsSize = partitions.size(); i < partitionsSize; i++) {
             List<SyndEntry> partition = partitions.get(i);
             log.debug("Write partition {} of {}", i + 1, partitionsSize);
-            writePartition(partition);
+
+            try {
+                lock.lock();
+                writePartition(partition);
+            }
+            finally {
+                lock.unlock();
+            }
         }
 
         Date lastDate = entries
