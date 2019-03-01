@@ -5,10 +5,7 @@ import com.github.ysamsonov.rssreader.worker.FeedProcessor;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -17,7 +14,7 @@ import java.util.stream.Collectors;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
-public class FeedFilterProcessor implements FeedProcessor<SyndFeed, Collection<SyndEntry>> {
+public class FeedFilterProcessor implements FeedProcessor<SyndFeed, List<SyndEntry>> {
 
     private final FeedConfig feedConfig;
 
@@ -26,7 +23,7 @@ public class FeedFilterProcessor implements FeedProcessor<SyndFeed, Collection<S
     }
 
     @Override
-    public Collection<SyndEntry> process(SyndFeed feed) {
+    public List<SyndEntry> process(SyndFeed feed) {
         if (feed == null) {
             return Collections.emptyList();
         }

@@ -20,11 +20,13 @@ public class BaseFeedSyncTaskFactory implements FeedSyncTaskFactory {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final int writerBatchSize;
+
     @Override
     public FeedSyncTask create(FeedConfig feedConfig, ReentrantLock writeLock) {
         var reader = new UrlFeedReader(feedConfig);
         var processor = new FeedFilterProcessor(feedConfig);
-        var writer = new FileFeedWriter(feedConfig, writeLock, eventPublisher);
+        var writer = new FileFeedWriter(feedConfig, writeLock, writerBatchSize, eventPublisher);
 
         return new FeedSyncTask(feedConfig, reader, processor, writer);
     }

@@ -53,7 +53,7 @@ class FeedSynchronizerTest {
                 fc,
                 new MockReader(fc),
                 new FeedFilterProcessor(fc),
-                new FileFeedWriter(fc, wl, eventPublisher)
+                new FileFeedWriter(fc, wl, 10, eventPublisher)
             )
         );
     }

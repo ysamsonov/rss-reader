@@ -40,7 +40,10 @@ public class Application {
         this.eventPublisher = new ApplicationEventPublisherImpl();
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile(), eventPublisher);
-        this.feedSynchronizer = new FeedSynchronizer(getSyncPoolSize(), new BaseFeedSyncTaskFactory(eventPublisher));
+        this.feedSynchronizer = new FeedSynchronizer(
+            getSyncPoolSize(),
+            new BaseFeedSyncTaskFactory(eventPublisher, getWriterBatchSize())
+        );
         this.commandLineInterface = new CommandLineInterface(configurationManager, this::exit);
     }
 
@@ -122,5 +125,14 @@ public class Application {
      */
     private int getSyncPoolSize() {
         return propertyResolver.getProperty("rssreader.feed.synchronizer.pool.size", Integer.class).orElse(4);
+    }
+
+    /**
+     * Write batch size to {@link com.github.ysamsonov.rssreader.worker.impl.FileFeedWriter}
+     *
+     * @return user given write batch size or default
+     */
+    private int getWriterBatchSize() {
+        return propertyResolver.getProperty("rssreader.feed.writer.batch.size", Integer.class).orElse(3);
     }
 }

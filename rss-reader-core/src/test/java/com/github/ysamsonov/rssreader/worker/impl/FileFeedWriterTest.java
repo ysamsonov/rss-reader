@@ -36,6 +36,7 @@ class FileFeedWriterTest {
         FileFeedWriter writer = new FileFeedWriter(
             feedConfig(),
             new ReentrantLock(),
+            10,
             eventPublisher
         );
 
@@ -50,6 +51,7 @@ class FileFeedWriterTest {
         FileFeedWriter writer = new FileFeedWriter(
             feedConfig(),
             new ReentrantLock(),
+            10,
             eventPublisher
         );
 
@@ -68,6 +70,7 @@ class FileFeedWriterTest {
         FileFeedWriter writer = new FileFeedWriter(
             feedConfigWithFilters(),
             new ReentrantLock(),
+            10,
             eventPublisher
         );
 

@@ -2,7 +2,7 @@ package com.github.ysamsonov.rssreader.worker;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Basic interface for output feed.
@@ -19,5 +19,5 @@ public interface FeedWriter {
      *
      * @param entries - items to write
      */
-    void write(Collection<SyndEntry> entries);
+    void write(List<SyndEntry> entries);
 }
