@@ -5,6 +5,7 @@ import com.github.ysamsonov.rssreader.config.ReaderConfig;
 import com.github.ysamsonov.rssreader.event.ApplicationEventPublisher;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.junit.TempFileExtension;
+import com.github.ysamsonov.rssreader.utils.TypeConverter;
 import com.github.ysamsonov.rssreader.worker.impl.FeedFilterProcessor;
 import com.github.ysamsonov.rssreader.worker.impl.FileFeedWriter;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -20,6 +21,7 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,7 +48,7 @@ class FeedSynchronizerTest {
     @BeforeEach
     void setUp() {
         feedSynchronizer = new FeedSynchronizer(
-            4,
+            2,
             (fc, wl) -> new FeedSyncTask(
                 fc,
                 new MockReader(fc),
@@ -64,8 +66,20 @@ class FeedSynchronizerTest {
     @Test
     void processIntoCommonFile() throws IOException {
         var conf = new ReaderConfig()
-            .addFeed(new FeedConfig().setUrl(URL_1).setFileName(resFile1.getTmpFile().getAbsolutePath()))
-            .addFeed(new FeedConfig().setUrl(URL_2).setFileName(resFile1.getTmpFile().getAbsolutePath()));
+            .addFeed(new FeedConfig()
+                .setUrl(URL_1)
+                .setFileName(resFile1.getTmpFile().getAbsolutePath())
+                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
+                .setFetchCount(1)
+                .setFetchTime("2s")
+            )
+            .addFeed(new FeedConfig()
+                .setUrl(URL_2)
+                .setFileName(resFile1.getTmpFile().getAbsolutePath())
+                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
+                .setFetchCount(1)
+                .setFetchTime("2s")
+            );
 
         feedSynchronizer.onStart(conf);
         awaitResult();
@@ -79,8 +93,20 @@ class FeedSynchronizerTest {
     @Test
     void processInSeparateFiles() throws IOException {
         var conf = new ReaderConfig()
-            .addFeed(new FeedConfig().setUrl(URL_1).setFileName(resFile1.getTmpFile().getAbsolutePath()))
-            .addFeed(new FeedConfig().setUrl(URL_2).setFileName(resFile2.getTmpFile().getAbsolutePath()));
+            .addFeed(new FeedConfig()
+                .setUrl(URL_1)
+                .setFileName(resFile1.getTmpFile().getAbsolutePath())
+                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
+                .setFetchCount(1)
+                .setFetchTime("2s")
+            )
+            .addFeed(new FeedConfig()
+                .setUrl(URL_2)
+                .setFileName(resFile2.getTmpFile().getAbsolutePath())
+                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
+                .setFetchCount(1)
+                .setFetchTime("2s")
+            );
 
         feedSynchronizer.onStart(conf);
         awaitResult();
