@@ -1,6 +1,7 @@
 package com.github.ysamsonov.rssreader.cli.action;
 
 import com.github.ysamsonov.rssreader.cli.Command;
+import com.github.ysamsonov.rssreader.exception.InterruptCliActionException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Scanner;
@@ -34,7 +35,7 @@ abstract class BaseConsoleAction implements Command.Action {
      *
      * @param msg           - message to show user before action
      * @param converter     - convert given string from console to type
-     * @param validator     - validates inputed data
+     * @param validator     - validate input data
      * @param fallbackValue - fall back value, returns if input is empty and if fallbackValue is not null
      * @return converter and validate value
      */
@@ -53,6 +54,10 @@ abstract class BaseConsoleAction implements Command.Action {
                 return fallbackValue;
             }
 
+            if (line.equalsIgnoreCase("exit")) {
+                throw new InterruptCliActionException();
+            }
+
             try {
                 val = converter.apply(line);
             }
@@ -64,7 +69,7 @@ abstract class BaseConsoleAction implements Command.Action {
             if (validator.test(val)) {
                 return val;
             }
-            System.out.println("Incorrect format of value. Please repeat.");
+            System.out.println("Incorrect format of value. Please repeat. Or interrupt the operation by typing 'exit'");
         }
     }
 }

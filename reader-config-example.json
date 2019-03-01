@@ -2,35 +2,43 @@
   "feeds": [
     {
       "url": "https://news.yandex.ru/sport.rss",
-      "enabled": false,
+      "enabled": true,
       "fileName": "concurrent.txt",
       "fields": [
         "title",
         "description",
         "publishedDate"
       ],
-      "fetchTime": "10s"
+      "fetchTime": "10s",
+      "fetchCount": 1,
+      "lastFetchDate": "2019-02-26T21:34:36.338+03:00"
     },
     {
       "url": "https://news.yandex.ru/auto.rss",
       "enabled": false,
       "fileName": "concurrent.txt",
       "fields": [],
-      "fetchTime": "10s"
+      "fetchTime": "10s",
+      "fetchCount": 10,
+      "lastFetchDate": "2019-02-27T21:34:36.338+03:00"
     },
     {
       "url": "http://www.freeke.org/ffg/index.atom",
       "enabled": false,
       "fileName": "concurrent.txt",
       "fields": [],
-      "fetchTime": "10s"
+      "fetchTime": "10s",
+      "fetchCount": 10,
+      "lastFetchDate": "2019-02-27T21:34:36.338+03:00"
     },
     {
       "url": "https://news.yandex.ru/science.rss",
       "enabled": false,
       "fileName": "concurrent.txt",
       "fields": [],
-      "fetchTime": "10s"
+      "fetchTime": "10s",
+      "fetchCount": 10,
+      "lastFetchDate": "2019-02-27T21:34:36.338+03:00"
     }
   ],
   "fetchCount": 10,

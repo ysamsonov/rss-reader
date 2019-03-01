@@ -8,8 +8,10 @@ import com.github.ysamsonov.rssreader.event.EditFeedEvent;
 import com.github.ysamsonov.rssreader.event.SwitchStateFeedEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -57,11 +59,17 @@ public class FeedSynchronizer {
         }
     }
 
+    /**
+     * Finalize all task before shutdown
+     */
     public void onShutdown() {
         log.info("Shutdown executor service");
         this.executorService.shutdown();
     }
 
+    /**
+     * Create task for new feed and schedule it
+     */
     public void onCreateFeed(CreateFeedEvent event) {
         if (!event.getFeedConfig().isEnabled()) {
             return;
@@ -72,32 +80,44 @@ public class FeedSynchronizer {
         }
     }
 
+    /**
+     * Handle modify feed event
+     */
     public void onEditFeed(EditFeedEvent event) {
         synchronized (monitor) {
-            deleteFeed(event.getFeedConfig());
+            deleteFeed(event.getFeedConfig(), event.getFileNames());
             addFeed(event.getReaderConfig(), event.getFeedConfig());
         }
     }
 
+    /**
+     * Handle delete feed event
+     */
     public void onDeleteFeed(DeleteFeedEvent event) {
         synchronized (monitor) {
-            deleteFeed(event.getFeedConfig());
+            deleteFeed(event.getFeedConfig(), event.getFileNames());
         }
     }
 
+    /**
+     * Handle switch state event, then create or delete feed
+     */
     public void onSwitchStateFeed(SwitchStateFeedEvent event) {
         // delete or create
         synchronized (monitor) {
             if (!event.isEnabled()) {
-                deleteFeed(event.getFeedConfig());
+                deleteFeed(event.getFeedConfig(), event.getFileNames());
             }
             else {
-                deleteFeed(event.getFeedConfig());
+                deleteFeed(event.getFeedConfig(), event.getFileNames());
                 addFeed(event.getReaderConfig(), event.getFeedConfig());
             }
         }
     }
 
+    /**
+     * Create task, writer lock for new feed, parse schedule config and schedule it
+     */
     private void addFeed(ReaderConfig config, FeedConfig feed) {
         final var writeLock = writerLocks.computeIfAbsent(feed.getFileName(), $ -> new ReentrantLock());
         final var task = syncTaskFactory.create(feed, writeLock);
@@ -116,17 +136,26 @@ public class FeedSynchronizer {
         runningTasks.put(feed.getUrl(), scheduledFuture);
     }
 
-    private void deleteFeed(FeedConfig feed) {
+    /**
+     * Cancel scheduled task for feed
+     */
+    private void deleteFeed(FeedConfig feed, Set<String> fileNames) {
         ScheduledFuture<?> future = runningTasks.get(feed.getUrl());
         if (future == null) {
             return;
         }
 
-        // TODO: may be false?
         future.cancel(true);
+        runningTasks.remove(feed.getUrl());
+        cleanupWriterLocks(fileNames);
     }
 
-    private void cleanupWriterLocks() {
-        // TODO: cleanup
+    private void cleanupWriterLocks(Set<String> fileNames) {
+        HashSet<String> locksToRemove = new HashSet<>(writerLocks.keySet());
+        locksToRemove.removeAll(fileNames);
+
+        for (String lockName : locksToRemove) {
+            writerLocks.remove(lockName);
+        }
     }
 }

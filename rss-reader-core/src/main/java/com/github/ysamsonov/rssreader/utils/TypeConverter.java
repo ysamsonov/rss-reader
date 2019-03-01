@@ -1,10 +1,14 @@
 package com.github.ysamsonov.rssreader.utils;
 
+import com.github.ysamsonov.rssreader.constants.DateFormats;
 import com.github.ysamsonov.rssreader.exception.TypeConvertException;
 import lombok.AllArgsConstructor;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -24,7 +28,8 @@ public final class TypeConverter {
         new Converter<>(equalTo(String.class), equalTo(Integer.class), (Function<String, Integer>) Integer::parseInt),
         new Converter<>(equalTo(String.class), equalTo(Long.class), (Function<String, Long>) Long::parseLong),
         new Converter<>(equalTo(String.class), equalTo(Double.class), Double::parseDouble),
-        new Converter<>(equalTo(String.class), equalTo(Float.class), Float::parseFloat)
+        new Converter<>(equalTo(String.class), equalTo(Float.class), Float::parseFloat),
+        new Converter<>(equalTo(String.class), equalTo(Date.class), TypeConverter::parseDate)
     );
 
     /**
@@ -65,6 +70,15 @@ public final class TypeConverter {
 
     private static <T> Predicate<T> equalTo(T expected) {
         return $ -> Objects.equals($, expected);
+    }
+
+    private static Date parseDate(String date) {
+        try {
+            return new SimpleDateFormat(DateFormats.DATE__TIME__TZ_ISO_8601).parse(date);
+        }
+        catch (ParseException e) {
+            throw new TypeConvertException("Unable to parse date %s", date);
+        }
     }
 
     @AllArgsConstructor

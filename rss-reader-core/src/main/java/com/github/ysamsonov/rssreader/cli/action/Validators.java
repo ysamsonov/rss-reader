@@ -1,13 +1,12 @@
 package com.github.ysamsonov.rssreader.cli.action;
 
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
+import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 import com.github.ysamsonov.rssreader.worker.DelayParser;
+import com.github.ysamsonov.rssreader.worker.impl.UrlFeedReader;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -34,36 +33,51 @@ final class Validators {
      * Validate feed link.
      * 1. check uniqueness for a given link
      * 2. try ping feed link
-     * 3. TODO: validate items and pubDate
+     * 3. validate items and pubDate
      *
      * @param cm - configuration manager to get access to feed config
      * @return validator predicate
      */
     static Predicate<String> link(ConfigurationManager cm) {
+        return existLink(cm).and(pingLink());
+    }
+
+    private static Predicate<String> existLink(ConfigurationManager cm) {
+        return link -> {
+            boolean hasFeed = cm
+                .getConfig()
+                .getFeeds()
+                .stream()
+                .anyMatch(f -> Objects.equals(f.getUrl(), link));
+
+            if (hasFeed) {
+                System.out.println(String.format("Feed with link '%s' already exists", link));
+                return false;
+            }
+            return true;
+        };
+    }
+
+    private static Predicate<String> pingLink() {
         return link -> {
             try {
-                boolean hasFeed = cm
-                    .getConfig()
-                    .getFeeds()
-                    .stream()
-                    .anyMatch(f -> Objects.equals(f.getUrl(), link));
+                var reader = new UrlFeedReader(new FeedConfig().setUrl(link));
+                var feed = reader.loadData();
 
-                if (hasFeed) {
-                    System.out.println(String.format("Feed with link '%s' already exists", link));
+                if (feed.getEntries().isEmpty()) {
+                    System.out.println("Feed doesn't have a history!");
                     return false;
                 }
 
-                var url = new URL(link);
-                var conn = url.openConnection();
-                conn.connect();
+                if (feed.getEntries().iterator().next().getPublishedDate() == null) {
+                    System.out.println("Feed doesn't have a published date on entries!");
+                    return false;
+                }
+
                 return true;
             }
-            catch (MalformedURLException e) {
-                System.out.println(String.format("Incorrect url %s", e.getMessage()));
-                return false;
-            }
-            catch (IOException e) {
-                System.out.println("Unable to connect to host");
+            catch (Exception e) {
+                System.out.println(String.format("Error during connect to url '%s'", e.getMessage()));
                 return false;
             }
         };
@@ -100,5 +114,14 @@ final class Validators {
                 return false;
             }
         };
+    }
+
+    /**
+     * Always return true fo value validation
+     *
+     * @return true
+     */
+    static <T> Predicate<T> anyValue() {
+        return v -> true;
     }
 }

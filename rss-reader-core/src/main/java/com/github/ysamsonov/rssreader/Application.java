@@ -1,12 +1,13 @@
 package com.github.ysamsonov.rssreader;
 
-import com.github.ysamsonov.rssreader.cli.CliInterface;
+import com.github.ysamsonov.rssreader.cli.CommandLineInterface;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.event.*;
 import com.github.ysamsonov.rssreader.helpers.PropertyResolver;
 import com.github.ysamsonov.rssreader.worker.BaseFeedSyncTaskFactory;
 import com.github.ysamsonov.rssreader.worker.FeedSynchronizer;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
@@ -16,6 +17,7 @@ import java.io.File;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-22
  */
+@Slf4j
 public class Application {
 
     @Getter
@@ -27,7 +29,7 @@ public class Application {
 
     private final FeedSynchronizer feedSynchronizer;
 
-    private final CliInterface cliInterface;
+    private final CommandLineInterface commandLineInterface;
 
     private final ApplicationEventPublisherImpl eventPublisher;
 
@@ -38,8 +40,11 @@ public class Application {
         this.eventPublisher = new ApplicationEventPublisherImpl();
         this.propertyResolver = new PropertyResolver();
         this.configurationManager = new ConfigurationManager(getReaderConfigFile(), eventPublisher);
-        this.feedSynchronizer = new FeedSynchronizer(getSyncPoolSize(), new BaseFeedSyncTaskFactory());
-        this.cliInterface = new CliInterface(configurationManager, this::exit);
+        this.feedSynchronizer = new FeedSynchronizer(
+            getSyncPoolSize(),
+            new BaseFeedSyncTaskFactory(eventPublisher, getWriterBatchSize())
+        );
+        this.commandLineInterface = new CommandLineInterface(configurationManager, this::exit);
     }
 
     /**
@@ -60,29 +65,47 @@ public class Application {
         eventPublisher.subscribe(EditFeedEvent.class, feedSynchronizer::onEditFeed);
         eventPublisher.subscribe(DeleteFeedEvent.class, feedSynchronizer::onDeleteFeed);
         eventPublisher.subscribe(SwitchStateFeedEvent.class, feedSynchronizer::onSwitchStateFeed);
+        eventPublisher.subscribe(UpdateLastFetchTimeEvent.class, configurationManager::onUpdateLastFetchTime);
 
         feedSynchronizer.onStart(configurationManager.getConfig());
+
+        addShutdownHook();
         return this;
+    }
+
+    private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Shutdown hook. Call onExit");
+            onExit();
+        }));
     }
 
     /**
      * Run application: show interface, etc.
      */
     private void run() {
-        cliInterface.show();
+        commandLineInterface.show();
+    }
+
+    /**
+     * Call onExit and shutdown on user action
+     */
+    private void exit() {
+        log.info("Exit from application manually (by user action)");
+        onExit();
+        System.exit(0);
     }
 
     /**
      * Correctly shutdown application
      */
-    private void exit() {
+    private void onExit() {
         System.out.println("Start shutdown");
 
         feedSynchronizer.onShutdown();
         configurationManager.onShutdown();
 
         System.out.println("Shutdown");
-        System.exit(0);
     }
 
     /**
@@ -102,5 +125,14 @@ public class Application {
      */
     private int getSyncPoolSize() {
         return propertyResolver.getProperty("rssreader.feed.synchronizer.pool.size", Integer.class).orElse(4);
+    }
+
+    /**
+     * Write batch size to {@link com.github.ysamsonov.rssreader.worker.impl.FileFeedWriter}
+     *
+     * @return user given write batch size or default
+     */
+    private int getWriterBatchSize() {
+        return propertyResolver.getProperty("rssreader.feed.writer.batch.size", Integer.class).orElse(3);
     }
 }

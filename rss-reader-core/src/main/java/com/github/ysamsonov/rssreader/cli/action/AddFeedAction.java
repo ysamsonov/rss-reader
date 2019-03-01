@@ -36,14 +36,14 @@ public class AddFeedAction extends BaseConsoleAction {
         String fileName = read(
             String.format("Filename: ('%s' by default)", fallbackFileName),
             Function.identity(),
-            f -> true,
+            Validators.anyValue(),
             fallbackFileName
         );
 
         boolean enabled = read(
             "Enabled (y/n)? (yes by default)",
             Parsers.booleanVal(),
-            f -> true,
+            Validators.anyValue(),
             true
         );
 
@@ -61,12 +61,20 @@ public class AddFeedAction extends BaseConsoleAction {
             configurationManager.getConfig().getFetchTime()
         );
 
+        int fetchCount = read(
+            String.format("Fetch count: (%d by default)", configurationManager.getConfig().getFetchCount()),
+            Integer::parseInt,
+            Validators.anyValue(),
+            configurationManager.getConfig().getFetchCount()
+        );
+
         FeedConfig feedConfig = new FeedConfig()
             .setUrl(link)
             .setFileName(fileName)
             .setEnabled(enabled)
             .setFields(fields)
-            .setFetchTime(fetchTime);
+            .setFetchTime(fetchTime)
+            .setFetchCount(fetchCount);
 
         configurationManager.addFeed(feedConfig);
         System.out.println("Feed successfully added!");

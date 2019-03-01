@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Manages application settings and provides CRUD methods for them
@@ -86,6 +87,7 @@ public class ConfigurationManager {
      */
     public void addFeed(@NonNull FeedConfig feed) {
         log.info("Add feed '{}'", feed.getUrl());
+        feed.setLastFetchDate(new Date());
         eventPublisher.publish(new CreateFeedEvent(feed, config));
 
         config.addFeed(feed);
@@ -119,7 +121,7 @@ public class ConfigurationManager {
         FeedConfig feed = config.getFeeds().get(feedNum);
 
         log.info("Update feed '{}'", feed.getUrl());
-        eventPublisher.publish(new DeleteFeedEvent(feed));
+        eventPublisher.publish(new DeleteFeedEvent(feed, config));
 
         config.deleteFeed(feedNum);
         persist();
@@ -140,6 +142,11 @@ public class ConfigurationManager {
         persist();
     }
 
+    public void onUpdateLastFetchTime(UpdateLastFetchTimeEvent event) {
+        log.info("Handle update last fetch time for feed {}", event.getFeedConfig().getUrl());
+        persist();
+    }
+
     /**
      * Get config from cache
      *
@@ -157,7 +164,6 @@ public class ConfigurationManager {
         persist();
     }
 
-    // TODO: надо переодически сбрасывать в файлы
     private void persist() {
         synchronized (monitor) {
             try {

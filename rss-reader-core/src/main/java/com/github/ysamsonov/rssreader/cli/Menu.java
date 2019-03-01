@@ -1,7 +1,9 @@
 package com.github.ysamsonov.rssreader.cli;
 
+import com.github.ysamsonov.rssreader.exception.InterruptCliActionException;
 import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Scanner;
@@ -12,6 +14,7 @@ import java.util.Scanner;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-23
  */
+@Slf4j
 @SuppressWarnings("WeakerAccess")
 @AllArgsConstructor
 public class Menu {
@@ -66,9 +69,17 @@ public class Menu {
                 continue;
             }
 
-            commands.get(commandNum)
-                .getAction()
-                .exec();
+
+            try {
+                Command command = commands.get(commandNum);
+                command
+                    .getAction()
+                    .exec();
+            }
+            catch (InterruptCliActionException e) {
+                log.info("Interrupt CLI action. {}", e.getMessage());
+                return;
+            }
             return;
         }
     }

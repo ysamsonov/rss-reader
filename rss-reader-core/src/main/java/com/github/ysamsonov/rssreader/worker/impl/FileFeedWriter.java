@@ -1,18 +1,22 @@
 package com.github.ysamsonov.rssreader.worker.impl;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.github.ysamsonov.rssreader.event.ApplicationEventPublisher;
+import com.github.ysamsonov.rssreader.event.UpdateLastFetchTimeEvent;
 import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
+import com.github.ysamsonov.rssreader.utils.Lists;
 import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import com.github.ysamsonov.rssreader.worker.FeedWriter;
 import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
@@ -31,37 +35,72 @@ public class FileFeedWriter implements FeedWriter {
 
     private final ReentrantLock lock;
 
-    public FileFeedWriter(FeedConfig feedConfig, ReentrantLock lock) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final int batchSize;
+
+    public FileFeedWriter(
+        FeedConfig feedConfig,
+        ReentrantLock lock,
+        int batchSize,
+        ApplicationEventPublisher eventPublisher
+    ) {
         this.feedConfig = feedConfig;
         this.propWritePredicate = feedConfig.fieldPredicate();
         this.lock = lock;
+        this.batchSize = batchSize;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
-    public void write(SyndFeed syndFeed) {
-        if (syndFeed == null) {
+    public void write(List<SyndEntry> entries) {
+        if (MiscUtils.isNullOrEmpty(entries)) {
             log.info("Nothing to write for '{}'", feedConfig.getUrl());
-            updateLastFetchDate();
+            updateLastFetchDate(new Date());
             return;
         }
 
-        try {
-            lock.lock();
-            writeFeed(syndFeed);
-        }
-        finally {
-            lock.unlock();
-        }
+        writeFeed(entries);
     }
 
-    private void writeFeed(SyndFeed syndFeed) {
-        log.info("Write data from feed '{}' to file '{}'", feedConfig.getUrl(), feedConfig.getFileName());
+    private void writeFeed(Collection<SyndEntry> entries) {
+        log.info(
+            "Write {} entries feed '{}' to file '{}'",
+            entries.size(), feedConfig.getUrl(), feedConfig.getFileName()
+        );
+
+        List<List<SyndEntry>> partitions = Lists.partition(Lists.asList(entries), batchSize);
+        log.debug("Split data on {} partition(s) by {} elements", partitions.size(), batchSize);
+
+        for (int i = 0, partitionsSize = partitions.size(); i < partitionsSize; i++) {
+            List<SyndEntry> partition = partitions.get(i);
+            log.debug("Write partition {} of {}", i + 1, partitionsSize);
+
+            try {
+                lock.lock();
+                writePartition(partition);
+            }
+            finally {
+                lock.unlock();
+            }
+        }
+
+        Date lastDate = entries
+            .stream()
+            .map(SyndEntry::getPublishedDate)
+            .max(Date::compareTo)
+            .orElseThrow();
+
+        updateLastFetchDate(lastDate);
+    }
+
+    private void writePartition(Collection<SyndEntry> entries) {
         try (
             FileWriter fileWriter = new FileWriter(feedConfig.getFileName(), true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             PrintWriter writer = new PrintWriter(bufferedWriter)
         ) {
-            for (SyndEntry entry : syndFeed.getEntries()) {
+            for (SyndEntry entry : entries) {
                 writeEntry(writer, entry);
             }
         }
@@ -75,8 +114,6 @@ public class FileFeedWriter implements FeedWriter {
             log.debug(msg, e);
             throw new RssReaderException(msg, e);
         }
-
-        updateLastFetchDate();
     }
 
     private void writeEntry(PrintWriter writer, SyndEntry entry) {
@@ -90,15 +127,16 @@ public class FileFeedWriter implements FeedWriter {
 
             String value = extractor.getValue().apply(entry);
             if (!MiscUtils.isNullOrEmpty(value)) {
-                writer.write(value);
+                writer.write(value.replace('\n', ' '));
             }
             writer.write("\n");
         }
         writer.write("\n");
     }
 
-    private void updateLastFetchDate() {
+    private void updateLastFetchDate(Date lastFetchDate) {
         log.info("Update last fetch date for '{}'", feedConfig.getUrl());
-        feedConfig.setLastFetchDate(new Date());
+        feedConfig.setLastFetchDate(lastFetchDate);
+        eventPublisher.publish(new UpdateLastFetchTimeEvent(feedConfig, lastFetchDate));
     }
 }

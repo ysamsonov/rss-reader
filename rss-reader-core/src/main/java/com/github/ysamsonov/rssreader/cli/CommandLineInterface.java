@@ -17,7 +17,7 @@ import java.util.Scanner;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-24
  */
-public class CliInterface {
+public class CommandLineInterface {
 
     private final ConfigurationManager configurationManager;
 
@@ -26,7 +26,7 @@ public class CliInterface {
      */
     private final Menu mainMenu;
 
-    public CliInterface(
+    public CommandLineInterface(
         ConfigurationManager configurationManager,
         Command.Action exitAction
     ) {

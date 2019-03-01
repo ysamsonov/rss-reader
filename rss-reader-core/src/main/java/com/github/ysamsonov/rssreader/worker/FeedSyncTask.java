@@ -1,9 +1,12 @@
 package com.github.ysamsonov.rssreader.worker;
 
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * Determine the complete stage of processing one feed.
@@ -28,7 +31,7 @@ public class FeedSyncTask implements Runnable {
     /**
      * Feed processor may include filtering, converting, etc.
      */
-    private final FeedProcessor<SyndFeed, SyndFeed> processor;
+    private final FeedProcessor<SyndFeed, List<SyndEntry>> processor;
 
     /**
      * Feed writer to the abstract consumer

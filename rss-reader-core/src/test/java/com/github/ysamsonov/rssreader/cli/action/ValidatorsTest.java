@@ -67,4 +67,10 @@ class ValidatorsTest {
         assertThat(Validators.fetchTime().test("10m")).isTrue();
         assertThat(Validators.fetchTime().test("10dd")).isFalse();
     }
+
+    @Test
+    void anyValue() {
+        assertThat(Validators.anyValue().test("10m")).isTrue();
+        assertThat(Validators.anyValue().test(101)).isTrue();
+    }
 }

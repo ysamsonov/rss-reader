@@ -4,7 +4,10 @@ import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.config.FeedConfig;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Scanner;
 import java.util.function.Function;
 
 /**
@@ -41,14 +44,14 @@ public class EditFeedAction extends BaseConsoleAction {
         String fileName = read(
             String.format("Filename: (current: %s)", originalFeedConfig.getFileName()),
             Function.identity(),
-            f -> true,
+            Validators.anyValue(),
             originalFeedConfig.getFileName()
         );
 
         boolean enabled = read(
             String.format("Enabled (y/n)? (current: %s)", originalFeedConfig.isEnabled() ? "yes" : "no"),
             Parsers.booleanVal(),
-            f -> true,
+            Validators.anyValue(),
             originalFeedConfig.isEnabled()
         );
 
@@ -62,7 +65,7 @@ public class EditFeedAction extends BaseConsoleAction {
             ),
             f -> new HashSet<>(Arrays.asList(f.split(" "))),
             Validators.fields(),
-            Collections.emptyList()
+            originalFeedConfig.getFields()
         );
 
         String fetchTime = read(
@@ -75,12 +78,20 @@ public class EditFeedAction extends BaseConsoleAction {
             originalFeedConfig.getFetchTime()
         );
 
+        int fetchCount = read(
+            String.format("Fetch count: (current: %d)", originalFeedConfig.getFetchCount()),
+            Integer::parseInt,
+            Validators.anyValue(),
+            originalFeedConfig.getFetchCount()
+        );
+
         FeedConfig feedConfig = new FeedConfig()
             .setUrl(originalFeedConfig.getUrl())
             .setFileName(fileName)
             .setEnabled(enabled)
             .setFields(fields)
-            .setFetchTime(fetchTime);
+            .setFetchTime(fetchTime)
+            .setFetchCount(fetchCount);
 
         configurationManager.updateFeed(feedNum, feedConfig);
     }
