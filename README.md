@@ -1,5 +1,5 @@
 # RSS Reader
-![Travis build](https://travis-ci.com/ysamsonov/rss-reader.svg?token=eeiUqii3zoxH4p569Lqh&branch=develop)
+![Travis build](https://travis-ci.org/ysamsonov/rss-reader.svg?branch=develop)
 
 
 # Usage
