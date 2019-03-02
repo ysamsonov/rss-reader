@@ -144,7 +144,7 @@ public class ConfigurationManager {
     }
 
     public void onUpdateLastFetchTime(UpdateLastFetchTimeEvent event) {
-        log.info("Handle update last fetch time for feed {}", event.getFeedConfig().getUrl());
+        log.info("Handle update last fetch time for feed '{}'", event.getFeedConfig().getUrl());
         persist();
     }
 
