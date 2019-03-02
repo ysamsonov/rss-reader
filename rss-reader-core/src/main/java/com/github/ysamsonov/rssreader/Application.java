@@ -57,6 +57,10 @@ public class Application {
         appInstance
             .init()
             .run();
+
+        // Call exit after finish main thread. Yes it can happen.
+        // For example: run from idea in debug mode and press stop button.
+        appInstance.exit();
     }
 
     /**

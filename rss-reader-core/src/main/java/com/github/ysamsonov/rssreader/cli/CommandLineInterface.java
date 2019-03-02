@@ -6,6 +6,7 @@ import com.github.ysamsonov.rssreader.cli.action.EditFeedAction;
 import com.github.ysamsonov.rssreader.cli.action.SwitchStateFeedAction;
 import com.github.ysamsonov.rssreader.config.ConfigurationManager;
 import com.github.ysamsonov.rssreader.config.FeedConfig;
+import com.github.ysamsonov.rssreader.exception.InterruptMenuException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,10 +59,14 @@ public class CommandLineInterface {
     /**
      * Show main menu after  finish of any command
      */
-    @SuppressWarnings("InfiniteLoopStatement")
     private void printMainMenu() {
         while (true) {
-            mainMenu.show();
+            try {
+                mainMenu.show();
+            }
+            catch (InterruptMenuException e) {
+                return;
+            }
         }
     }
 

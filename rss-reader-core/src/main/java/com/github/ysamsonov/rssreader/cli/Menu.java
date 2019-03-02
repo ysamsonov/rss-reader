@@ -1,11 +1,13 @@
 package com.github.ysamsonov.rssreader.cli;
 
 import com.github.ysamsonov.rssreader.exception.InterruptCliActionException;
+import com.github.ysamsonov.rssreader.exception.InterruptMenuException;
 import com.github.ysamsonov.rssreader.utils.MiscUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -32,6 +34,9 @@ public class Menu {
         showMenu();
         try {
             awaitAction();
+        }
+        catch (NoSuchElementException noSuchEl) {
+            throw new InterruptMenuException();
         }
         catch (Exception e) {
             System.out.println(String.format(
