@@ -33,6 +33,8 @@ public class Application {
 
     private final ApplicationEventPublisherImpl eventPublisher;
 
+    private boolean exitCall = false;
+
     /**
      * Constructor instantiate application context
      */
@@ -100,12 +102,17 @@ public class Application {
      * Correctly shutdown application
      */
     private void onExit() {
+        if (exitCall) {
+            return;
+        }
+
         System.out.println("Start shutdown");
 
         feedSynchronizer.onShutdown();
         configurationManager.onShutdown();
 
         System.out.println("Shutdown");
+        exitCall = true;
     }
 
     /**
