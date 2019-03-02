@@ -77,7 +77,7 @@ final class Validators {
                 return true;
             }
             catch (Exception e) {
-                System.out.println(String.format("Error during connect to url '%s'", e.getMessage()));
+                System.out.println(String.format("Error during read feed '%s'.", link));
                 return false;
             }
         };

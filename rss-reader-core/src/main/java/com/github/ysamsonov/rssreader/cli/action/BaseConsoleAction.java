@@ -71,10 +71,8 @@ abstract class BaseConsoleAction implements Command.Action {
             if (validator.test(val)) {
                 return val;
             }
-            System.out.println(String.format(
-                "Incorrect format of value. Please repeat. Or interrupt the operation by typing '%s'",
-                EXIT_CMD
-            ));
+
+            System.out.println(String.format("Please repeat. Or interrupt the operation by typing '%s'", EXIT_CMD));
         }
     }
 }
