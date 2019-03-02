@@ -29,17 +29,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Yuriy A. Samsonov <yuriy.samsonov96@gmail.com>
  * @since 2019-02-26
  */
-class FeedSynchronizerTest {
+class FeedSynchronizerOrderTest {
 
     private static final String URL_1 = "http://mock.url/tst1.rss";
 
-    private static final String URL_2 = "http://mock2.url/tst2.rss";
-
     @RegisterExtension
     final TempFileExtension resFile1 = new TempFileExtension();
-
-    @RegisterExtension
-    final TempFileExtension resFile2 = new TempFileExtension();
 
     private final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
@@ -51,9 +46,9 @@ class FeedSynchronizerTest {
             2,
             (fc, wl) -> new FeedSyncTask(
                 fc,
-                new MockReader(fc),
+                new MockReader(),
                 new FeedFilterProcessor(fc),
-                new FileFeedWriter(fc, wl, 10, Date::new, eventPublisher)
+                new FileFeedWriter(fc, wl, 10, new MockDateProvider(), eventPublisher)
             )
         );
     }
@@ -64,45 +59,11 @@ class FeedSynchronizerTest {
     }
 
     @Test
-    void processIntoCommonFile() throws IOException {
+    void processWithNewItemsAfterFirstIteration() throws IOException {
         var conf = new ReaderConfig()
             .addFeed(new FeedConfig()
                 .setUrl(URL_1)
                 .setFileName(resFile1.getTmpFile().getAbsolutePath())
-                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
-                .setFetchCount(1)
-                .setFetchTime("2s")
-            )
-            .addFeed(new FeedConfig()
-                .setUrl(URL_2)
-                .setFileName(resFile1.getTmpFile().getAbsolutePath())
-                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
-                .setFetchCount(1)
-                .setFetchTime("2s")
-            );
-
-        feedSynchronizer.onStart(conf);
-        awaitResult();
-
-        String content = Files.readString(resFile1.getTmpFile().toPath());
-
-        assertRssResultFullWithOrder(content);
-        assertAtomResultOnlyFirstItems(content);
-    }
-
-    @Test
-    void processInSeparateFiles() throws IOException {
-        var conf = new ReaderConfig()
-            .addFeed(new FeedConfig()
-                .setUrl(URL_1)
-                .setFileName(resFile1.getTmpFile().getAbsolutePath())
-                .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
-                .setFetchCount(1)
-                .setFetchTime("2s")
-            )
-            .addFeed(new FeedConfig()
-                .setUrl(URL_2)
-                .setFileName(resFile2.getTmpFile().getAbsolutePath())
                 .setLastFetchDate(TypeConverter.convert(Date.class, "2019-02-24T21:34:36.338Z"))
                 .setFetchCount(1)
                 .setFetchTime("2s")
@@ -112,23 +73,35 @@ class FeedSynchronizerTest {
         awaitResult();
 
         String content1 = Files.readString(resFile1.getTmpFile().toPath());
-        String content2 = Files.readString(resFile2.getTmpFile().toPath());
 
         assertRssResultFullWithOrder(content1);
-        assertAtomResultOnlyFirstItems(content2);
     }
 
     private void assertRssResultFullWithOrder(String content) {
+        // check correct order of items
+        assertThat(content)
+            .containsSubsequence("title: Роджерс назначен главным тренером", "title: «Спартак» обыграл СКА");
+
         // check contains required text
         assertThat(content)
+            .contains("title: Роджерс назначен главным тренером")
+            .contains("description: «Лестер» объявил о назначении")
+
             .contains("title: «Спартак» обыграл СКА")
             .contains("description: Хоккеисты петербургского СКА")
         ;
     }
 
     private void assertAtomResultOnlyFirstItems(String content) {
+        // check correct order of items
+        assertThat(content)
+            .containsSubsequence("title: Our Cat Thinks A Dog", "title: Ziggy The Hunter");
+
         // check contains required text
         assertThat(content)
+            .contains("title: Our Cat Thinks A Dog")
+            .contains("contents: Ziggy really is quite the cat")
+
             .contains("title: Ziggy The Hunter")
             .contains("contents: The hunter takes down his prey.")
         ;
@@ -139,22 +112,44 @@ class FeedSynchronizerTest {
         Thread.sleep(2_500);
     }
 
+    private static class MockDateProvider implements DateProvider {
+
+        private int iterationNum = 0;
+
+        @Override
+        public Date getDate() {
+            iterationNum++;
+            switch (iterationNum) {
+                case 1:
+                    // 26 Feb 2019 19:12:00 +0000
+                    return new Date(1551208320000L);
+
+                case 2:
+                    return new Date();
+
+                default:
+                    throw new RssReaderException("Unexpected iteration num '%d'", iterationNum);
+            }
+        }
+    }
+
     @RequiredArgsConstructor
     private static class MockReader implements FeedReader {
 
-        private final FeedConfig feedConfig;
+        private int iterationNum = 0;
 
         @Override
         public SyndFeed loadData() {
-            switch (feedConfig.getUrl()) {
-                case URL_1:
-                    return readFeed("rss.xml");
+            iterationNum++;
+            switch (iterationNum) {
+                case 1:
+                    return readFeed("rss-first.xml");
 
-                case URL_2:
-                    return readFeed("atom.xml");
+                case 2:
+                    return readFeed("rss-second.xml");
 
                 default:
-                    throw new RssReaderException("Unknown url '%s'", feedConfig.getUrl());
+                    throw new RssReaderException("Unexpected iteration num '%d'", iterationNum);
             }
         }
 

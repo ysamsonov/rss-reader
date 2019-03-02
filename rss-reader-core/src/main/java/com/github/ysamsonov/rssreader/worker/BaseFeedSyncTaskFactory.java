@@ -7,6 +7,7 @@ import com.github.ysamsonov.rssreader.worker.impl.FileFeedWriter;
 import com.github.ysamsonov.rssreader.worker.impl.UrlFeedReader;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -26,7 +27,7 @@ public class BaseFeedSyncTaskFactory implements FeedSyncTaskFactory {
     public FeedSyncTask create(FeedConfig feedConfig, ReentrantLock writeLock) {
         var reader = new UrlFeedReader(feedConfig);
         var processor = new FeedFilterProcessor(feedConfig);
-        var writer = new FileFeedWriter(feedConfig, writeLock, writerBatchSize, eventPublisher);
+        var writer = new FileFeedWriter(feedConfig, writeLock, writerBatchSize, Date::new, eventPublisher);
 
         return new FeedSyncTask(feedConfig, reader, processor, writer);
     }

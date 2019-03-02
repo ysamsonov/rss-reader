@@ -37,6 +37,7 @@ class FileFeedWriterTest {
             feedConfig(),
             new ReentrantLock(),
             10,
+            Date::new,
             eventPublisher
         );
 
@@ -52,6 +53,7 @@ class FileFeedWriterTest {
             feedConfig(),
             new ReentrantLock(),
             10,
+            Date::new,
             eventPublisher
         );
 
@@ -71,6 +73,7 @@ class FileFeedWriterTest {
             feedConfigWithFilters(),
             new ReentrantLock(),
             10,
+            Date::new,
             eventPublisher
         );
 

@@ -7,6 +7,7 @@ import com.github.ysamsonov.rssreader.exception.RssReaderException;
 import com.github.ysamsonov.rssreader.helpers.FieldExtractors;
 import com.github.ysamsonov.rssreader.utils.Lists;
 import com.github.ysamsonov.rssreader.utils.MiscUtils;
+import com.github.ysamsonov.rssreader.worker.DateProvider;
 import com.github.ysamsonov.rssreader.worker.FeedWriter;
 import com.rometools.rome.feed.synd.SyndEntry;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +38,15 @@ public class FileFeedWriter implements FeedWriter {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final DateProvider dateProvider;
+
     private final int batchSize;
 
     public FileFeedWriter(
         FeedConfig feedConfig,
         ReentrantLock lock,
         int batchSize,
+        DateProvider dateProvider,
         ApplicationEventPublisher eventPublisher
     ) {
         this.feedConfig = feedConfig;
@@ -50,6 +54,7 @@ public class FileFeedWriter implements FeedWriter {
         this.lock = lock;
         this.batchSize = batchSize;
         this.eventPublisher = eventPublisher;
+        this.dateProvider = dateProvider;
     }
 
     @Override
@@ -85,13 +90,7 @@ public class FileFeedWriter implements FeedWriter {
             }
         }
 
-        Date lastDate = entries
-            .stream()
-            .map(SyndEntry::getPublishedDate)
-            .max(Date::compareTo)
-            .orElseThrow();
-
-        updateLastFetchDate(lastDate);
+        updateLastFetchDate(dateProvider.getDate());
     }
 
     private void writePartition(Collection<SyndEntry> entries) {

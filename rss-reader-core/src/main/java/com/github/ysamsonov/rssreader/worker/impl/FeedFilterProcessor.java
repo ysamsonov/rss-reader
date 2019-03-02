@@ -5,7 +5,10 @@ import com.github.ysamsonov.rssreader.worker.FeedProcessor;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -33,8 +36,13 @@ public class FeedFilterProcessor implements FeedProcessor<SyndFeed, List<SyndEnt
             .stream()
             .filter(e -> Objects.nonNull(e.getPublishedDate()))
             .filter(e -> e.getPublishedDate().compareTo(lastFetchDate) > 0)
-            .sorted(Comparator.comparing(SyndEntry::getPublishedDate))
+
+            // take n last records
+            .sorted(Comparator.comparing(SyndEntry::getPublishedDate).reversed())
             .limit(feedConfig.getFetchCount())
+
+            // sort last records by date
+            .sorted(Comparator.comparing(SyndEntry::getPublishedDate))
             .collect(Collectors.toList())
             ;
     }
